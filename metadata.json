@@ -1,0 +1,8 @@
+{
+  "name": "GitHub Scorecard Generator",
+  "description": "An AI-powered developer evaluation tool that analyzes public GitHub profiles, repo quality, and contribution metrics to generate direct visual scorecards, graded metrics, and career recommendations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
