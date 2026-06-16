@@ -348,10 +348,41 @@ export default function App() {
                 Connect your developer journey. Fetch any public GitHub handle and receive an 
                 AI-quantified developer scorecard, deep code analysis, repository breakdown, and role matching suggestions.
               </p>
+
+              {/* Quick direct landing CTAs */}
+              <div id="hero-actions" className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                <a 
+                  href="#verify-input" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById("verify-input")?.scrollIntoView({ behavior: "smooth" });
+                    const inp = document.getElementById("username-input") as HTMLInputElement;
+                    if (inp) inp.focus();
+                  }}
+                  className="px-5 py-2.5 bg-gradient-to-r from-brand-purple to-brand-blue hover:from-brand-purple/95 hover:to-brand-blue/95 text-white text-xs font-bold font-mono tracking-wide uppercase rounded-xl transition-all shadow-md shadow-brand-purple/20 flex items-center gap-1.5"
+                >
+                  <Search className="w-3.5 h-3.5" />
+                  Get Your Score
+                </a>
+                <button 
+                  onClick={() => setCurrentTab("compare")}
+                  className="px-5 py-2.5 bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold font-mono tracking-wide uppercase rounded-xl transition-all flex items-center gap-1.5"
+                >
+                  <Users className="w-3.5 h-3.5 text-brand-blue" />
+                  Compare Profiles
+                </button>
+                <button 
+                  onClick={() => setCurrentTab("leaderboard")}
+                  className="px-5 py-2.5 bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold font-mono tracking-wide uppercase rounded-xl transition-all flex items-center gap-1.5"
+                >
+                  <Award className="w-3.5 h-3.5 text-brand-amber" />
+                  View Rankings
+                </button>
+              </div>
             </div>
 
             {/* Analysis Entry Box */}
-            <div className="max-w-xl mx-auto">
+            <div id="verify-input" className="scroll-mt-24 max-w-xl mx-auto">
               <div className="bg-gray-900/40 p-6 sm:p-8 rounded-2xl border border-gray-800 shadow-2xl space-y-5 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-brand-purple/5 rounded-full blur-3xl"></div>
                 
@@ -369,6 +400,7 @@ export default function App() {
                   <div className="relative">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
                     <input 
+                      id="username-input"
                       type="text"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
