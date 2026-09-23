@@ -101,7 +101,7 @@ export default function App() {
       "Querying public user metadata and followers...",
       "Parsing repository metadata and topic tags...",
       "Inspecting code quality and README completeness...",
-      "Invoking Gemini AI scoring engine & developer review...",
+      "Invoking AI scoring engine & developer review...",
       "Formulating career path & job alignment insights..."
     ];
 
@@ -323,7 +323,7 @@ export default function App() {
                 </div>
 
                 <div className="mt-8 text-xs text-gray-500 font-mono italic max-w-sm">
-                  Applying Gemini AI analysis over commits, public contributions, and code structures.
+                  Applying AI analysis over commits, public contributions, and code structures.
                 </div>
               </div>
             </motion.div>
@@ -338,7 +338,7 @@ export default function App() {
             <div className="text-center max-w-3xl mx-auto space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-purple/10 border border-brand-purple/30 rounded-full text-brand-purple font-mono text-xs uppercase tracking-wider mb-2">
                 <Sparkles className="w-3.5 h-3.5" />
-                Gemini-Powered Recruitment Metrics
+                AI-Powered Recruitment Metrics
               </div>
 
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-display font-black tracking-tight leading-tight text-white">
@@ -1650,7 +1650,7 @@ export default function App() {
                   <div>
                     <h4 className="font-bold text-white text-base">Repository Quality Checks (200 Pts max)</h4>
                     <p className="text-xs text-gray-400 mt-1 leading-relaxed">
-                      Gemini reviews public repositories. Evaluates repository tagging, descriptions defined, stars, watchers, issue ratios list, and MIT licenses setup, ensuring code is corporate-ready.
+                      AI audits inspect public repositories. Evaluates repository tagging, descriptions defined, stars, watchers, issue ratios list, and MIT licenses setup, ensuring code is corporate-ready.
                     </p>
                   </div>
                 </div>
@@ -1706,7 +1706,7 @@ export default function App() {
       {/* Styled Footer */}
       <footer className="border-t border-gray-800 bg-[#0B1020]/25 py-8 mt-24 text-center text-xs text-gray-500 font-mono print:hidden">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p>© {new Date().getFullYear()} GitScore — GitHub Scorecard Generator. Powered by Gemini AI. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} GitScore — GitHub Scorecard Generator. All rights reserved.</p>
           <div className="flex gap-6">
             <a href="https://docs.github.com/en/rest" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">GitHub API docs</a>
             <span>•</span>
