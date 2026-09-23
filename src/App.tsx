@@ -31,7 +31,9 @@ import {
   Briefcase,
   ChevronRight,
   HelpCircle,
-  ExternalLink
+  ExternalLink,
+  Menu,
+  X
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { GithubProfile, RepoAnalysis, Scorecard, ScorecardReport, LeaderboardEntry } from "./types";
@@ -40,6 +42,7 @@ export default function App() {
   // Navigation tabs
   // 'landing' | 'dashboard' | 'compare' | 'leaderboard' | 'about'
   const [currentTab, setCurrentTab] = useState<string>("landing");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   // Single analysis states
   const [username, setUsername] = useState<string>("");
@@ -490,10 +493,13 @@ export default function App() {
     <div className="min-h-screen text-gray-200 selection:bg-brand-purple/40">
       
       {/* Top Header Navigation */}
-      <header className="sticky top-0 z-40 bg-[#0B1020]/80 backdrop-blur-xl border-b border-gray-800 px-4 py-3">
+      <header className="sticky top-0 z-40 bg-[#0B1020]/90 backdrop-blur-xl border-b border-gray-800 px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div 
-            onClick={() => setCurrentTab("landing")} 
+            onClick={() => {
+              setCurrentTab("landing");
+              setMobileMenuOpen(false);
+            }} 
             className="flex items-center gap-2.5 cursor-pointer group"
             id="brand-logo"
           >
@@ -508,6 +514,7 @@ export default function App() {
             </div>
           </div>
 
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
             <button 
               onClick={() => setCurrentTab("landing")}
@@ -543,14 +550,143 @@ export default function App() {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setCurrentTab("score")}
-              className="inline-flex items-center gap-1.5 text-xs font-bold font-mono uppercase tracking-wider px-3.5 py-2 bg-gradient-to-r from-brand-purple to-brand-blue text-white rounded-lg hover:opacity-90 active:scale-95 transition-all shadow-md shadow-brand-purple/20"
+              onClick={() => {
+                setCurrentTab("score");
+                setMobileMenuOpen(false);
+              }}
+              className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold font-mono uppercase tracking-wider px-3.5 py-2 bg-gradient-to-r from-brand-purple to-brand-blue text-white rounded-lg hover:opacity-90 active:scale-95 transition-all shadow-md shadow-brand-purple/20"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              Get Your Score
+              Get Score
+            </button>
+
+            {/* Mobile Hamburger Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 rounded-xl bg-gray-900 border border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800 transition-all active:scale-95 flex items-center justify-center"
+              aria-label="Toggle Navigation Menu"
+            >
+              {mobileMenuOpen ? (
+                <X className="w-5 h-5 text-brand-purple" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
             </button>
           </div>
         </div>
+
+        {/* Mobile Dropdown Navigation Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden border-t border-gray-800 mt-3 pt-3 pb-2 space-y-1 overflow-hidden"
+            >
+              <button
+                onClick={() => {
+                  setCurrentTab("landing");
+                  setMobileMenuOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  currentTab === "landing"
+                    ? "bg-brand-purple/20 text-brand-purple border border-brand-purple/30 font-bold"
+                    : "text-gray-300 hover:bg-gray-800/80 hover:text-white"
+                }`}
+              >
+                <div className="w-7 h-7 rounded-lg bg-gray-900 border border-gray-800 flex items-center justify-center shrink-0">
+                  <Github className="w-3.5 h-3.5 text-brand-purple" />
+                </div>
+                <span>Home</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setCurrentTab("score");
+                  setMobileMenuOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  currentTab === "score"
+                    ? "bg-brand-purple/20 text-brand-purple border border-brand-purple/30 font-bold"
+                    : "text-gray-300 hover:bg-gray-800/80 hover:text-white"
+                }`}
+              >
+                <div className="w-7 h-7 rounded-lg bg-gray-900 border border-gray-800 flex items-center justify-center shrink-0">
+                  <Sparkles className="w-3.5 h-3.5 text-brand-purple" />
+                </div>
+                <span>Get Your Score</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setCurrentTab("compare");
+                  setMobileMenuOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  currentTab === "compare"
+                    ? "bg-brand-blue/20 text-brand-blue border border-brand-blue/30 font-bold"
+                    : "text-gray-300 hover:bg-gray-800/80 hover:text-white"
+                }`}
+              >
+                <div className="w-7 h-7 rounded-lg bg-gray-900 border border-gray-800 flex items-center justify-center shrink-0">
+                  <Users className="w-3.5 h-3.5 text-brand-blue" />
+                </div>
+                <span>Compare Developers</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setCurrentTab("leaderboard");
+                  setMobileMenuOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  currentTab === "leaderboard"
+                    ? "bg-brand-amber/20 text-brand-amber border border-brand-amber/30 font-bold"
+                    : "text-gray-300 hover:bg-gray-800/80 hover:text-white"
+                }`}
+              >
+                <div className="w-7 h-7 rounded-lg bg-gray-900 border border-gray-800 flex items-center justify-center shrink-0">
+                  <Award className="w-3.5 h-3.5 text-brand-amber" />
+                </div>
+                <span>Global Rankings</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setCurrentTab("about");
+                  setMobileMenuOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  currentTab === "about"
+                    ? "bg-brand-green/20 text-brand-green border border-brand-green/30 font-bold"
+                    : "text-gray-300 hover:bg-gray-800/80 hover:text-white"
+                }`}
+              >
+                <div className="w-7 h-7 rounded-lg bg-gray-900 border border-gray-800 flex items-center justify-center shrink-0">
+                  <Info className="w-3.5 h-3.5 text-brand-green" />
+                </div>
+                <span>Algorithm & Criteria</span>
+              </button>
+
+              {/* Mobile CTA Quick Button */}
+              <div className="pt-2">
+                <button
+                  onClick={() => {
+                    setCurrentTab("score");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full py-2.5 px-4 bg-gradient-to-r from-brand-purple to-brand-blue text-white font-mono font-bold text-xs uppercase rounded-xl flex items-center justify-center gap-2 shadow-md shadow-brand-purple/20"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Analyze Profile Now
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* Main Display Container */}
