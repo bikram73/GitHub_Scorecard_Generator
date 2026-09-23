@@ -936,7 +936,29 @@ export default function App() {
 
         {/* PROFILE DASHBOARD REPORT CARD */}
         {currentTab === "dashboard" && currentReport && (
-          <div className="space-y-8 animate-fade-in print:bg-white print:text-black">
+          <div className="space-y-8 animate-fade-in print:p-0 print:space-y-6">
+            
+            {/* Colorful Official Print Header (Visible only when generating PDF/printing) */}
+            <div className="hidden print:flex items-center justify-between p-5 rounded-2xl bg-gradient-to-r from-brand-purple/20 via-brand-blue/20 to-brand-green/20 border-2 border-brand-purple/40 mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-purple to-brand-blue flex items-center justify-center text-white font-bold shadow-md">
+                  <Github className="w-6 h-6" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-display font-black text-white tracking-tight">
+                    GITSCORE <span className="text-brand-purple">OFFICIAL SCORECARD</span>
+                  </h1>
+                  <p className="text-[10px] font-mono text-brand-green uppercase tracking-widest">
+                    Verified GitHub Technical Evaluation
+                  </p>
+                </div>
+              </div>
+
+              <div className="text-right font-mono text-xs">
+                <span className="text-brand-amber font-bold">Top {currentReport.scorecard.percentile}% Worldwide</span>
+                <p className="text-[10px] text-gray-400">Issued: {new Date(currentReport.scorecard.analyzedAt).toLocaleDateString()}</p>
+              </div>
+            </div>
             
             {/* Header / Actions bar */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-800 pb-6 print:hidden">
@@ -966,7 +988,7 @@ export default function App() {
                 </a>
                 <button 
                   onClick={handlePrintCard}
-                  className="px-4 py-2 bg-brand-blue text-white font-bold rounded-lg text-xs flex items-center gap-1.5 hover:bg-brand-blue/90 transition-colors shadow-md shadow-brand-blue/15"
+                  className="px-4 py-2 bg-gradient-to-r from-brand-purple via-brand-blue to-brand-purple hover:opacity-95 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 transition-all shadow-md shadow-brand-purple/25 active:scale-95 cursor-pointer"
                 >
                   <Download className="w-3.5 h-3.5" />
                   Print Scorecard PDF

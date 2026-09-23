@@ -41,3 +41,68 @@ body {
   font-family: var(--font-sans);
   overflow-x: hidden;
 }
+
+/* Enhanced High-Definition Colorful PDF & Print Rules */
+@media print {
+  @page {
+    margin: 10mm;
+    size: A4 portrait;
+  }
+
+  *, *::before, *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  html, body {
+    background-color: #0B1020 !important;
+    background-image: none !important;
+    color: #F3F4F6 !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  header, nav, footer, .print-hidden, .no-print {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 auto !important;
+    max-width: 100% !important;
+  }
+
+  .print-avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Force rich dark card containers in print */
+  .bg-gray-900\/30, .bg-gray-900\/40, .bg-gray-900\/60, .bg-gray-900\/20, .bg-gray-900 {
+    background-color: #111827 !important;
+    border-color: #374151 !important;
+  }
+
+  .bg-black\/50, .bg-black\/40, .bg-black\/60, .bg-black\/30 {
+    background-color: #070B19 !important;
+    border-color: #1F2937 !important;
+  }
+
+  .border-gray-800, .border-gray-850 {
+    border-color: #2D3748 !important;
+  }
+
+  /* Vibrant colors */
+  .text-brand-purple { color: #A78BFA !important; }
+  .bg-brand-purple { background-color: #8B5CF6 !important; }
+  .text-brand-blue { color: #60A5FA !important; }
+  .bg-brand-blue { background-color: #3B82F6 !important; }
+  .text-brand-green { color: #4ADE80 !important; }
+  .bg-brand-green { background-color: #22C55E !important; }
+  .text-brand-amber { color: #FBBF24 !important; }
+  .bg-brand-amber { background-color: #F59E0B !important; }
+}
+
