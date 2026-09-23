@@ -603,166 +603,335 @@ export default function App() {
 
         {/* LANDING TAB */}
         {currentTab === "landing" && (
-          <div className="space-y-16 py-4">
+          <div className="space-y-20 py-4">
             
             {/* Elegant Hero Grid */}
-            <div className="text-center max-w-3xl mx-auto space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-purple/10 border border-brand-purple/30 rounded-full text-brand-purple font-mono text-xs uppercase tracking-wider mb-2">
-                <Sparkles className="w-3.5 h-3.5" />
-                AI-Powered Recruitment Metrics
+            <div className="text-center max-w-4xl mx-auto space-y-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-brand-purple/10 border border-brand-purple/30 rounded-full text-brand-purple font-mono text-xs uppercase tracking-wider mb-2">
+                <Sparkles className="w-3.5 h-3.5 text-brand-purple animate-pulse" />
+                AI-Powered GitHub Technical Evaluation
               </div>
 
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-display font-black tracking-tight leading-tight text-white">
+              <h1 className="text-4xl sm:text-6xl md:text-7xl font-display font-black tracking-tight leading-none text-white">
                 How Strong Is Your <br />
                 <span className="bg-gradient-to-r from-brand-blue via-brand-purple to-brand-amber bg-clip-text text-transparent">
                   GitHub Profile?
                 </span>
               </h1>
 
-              <p className="text-lg text-gray-400 max-w-2xl mx-auto font-sans leading-relaxed">
-                Connect your developer journey. Enter any public GitHub handle and receive an 
-                AI-quantified developer scorecard (0-1000), deep code analysis, repository breakdown, and role matching suggestions.
+              <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto font-sans leading-relaxed">
+                Enter any public GitHub handle to receive an instant <strong className="text-white">0–1000 technical scorecard</strong>, 
+                7-pillar architectural analysis, career role matching, and a recruiter-ready PDF report.
               </p>
 
-              {/* Quick direct landing CTAs */}
-              <div id="hero-actions" className="flex flex-wrap items-center justify-center gap-3 pt-2">
-                <button 
-                  onClick={() => setCurrentTab("score")}
-                  className="px-6 py-3 bg-gradient-to-r from-brand-purple to-brand-blue hover:from-brand-purple/95 hover:to-brand-blue/95 text-white text-xs font-bold font-mono tracking-wide uppercase rounded-xl transition-all shadow-lg shadow-brand-purple/25 flex items-center gap-2 active:scale-95"
+              {/* Direct Quick Search Input Box in Hero */}
+              <div className="max-w-2xl mx-auto pt-2">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (username.trim()) handleAnalyze(username);
+                  }}
+                  className="relative flex flex-col sm:flex-row gap-2 bg-gray-900/80 border border-gray-700/80 p-2 rounded-2xl shadow-2xl backdrop-blur-xl focus-within:border-brand-purple transition-all"
                 >
-                  <Sparkles className="w-4 h-4" />
-                  Get Your Score
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                  <div className="relative flex-1 flex items-center">
+                    <Search className="absolute left-4 text-gray-500 w-5 h-5 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="e.g. bikram73, torvalds, yyx990803"
+                      className="w-full bg-transparent pl-12 pr-4 py-3.5 text-sm text-white placeholder-gray-500 focus:outline-none font-mono"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={!username.trim() || isAnalyzing}
+                    className="px-6 py-3.5 bg-gradient-to-r from-brand-purple to-brand-blue disabled:opacity-50 text-white text-xs font-bold font-mono tracking-wide uppercase rounded-xl transition-all shadow-lg shadow-brand-purple/20 flex items-center justify-center gap-2 hover:opacity-95 active:scale-95 cursor-pointer shrink-0"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    Analyze Score
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </form>
+
+                {/* Popular sample developers quick tags */}
+                <div className="flex flex-wrap items-center justify-center gap-2 mt-3 text-xs font-mono text-gray-400">
+                  <span className="text-gray-500">Quick Try:</span>
+                  {[
+                    { label: "bikram73", handle: "bikram73" },
+                    { label: "torvalds", handle: "torvalds" },
+                    { label: "yyx990803", handle: "yyx990803" },
+                    { label: "gaearon", handle: "gaearon" },
+                    { label: "shadcn", handle: "shadcn" }
+                  ].map((dev) => (
+                    <button
+                      key={dev.handle}
+                      type="button"
+                      onClick={() => {
+                        setUsername(dev.handle);
+                        handleAnalyze(dev.handle);
+                      }}
+                      className="px-2.5 py-1 bg-black/40 hover:bg-brand-purple/20 border border-gray-800 hover:border-brand-purple/40 rounded-lg text-gray-300 hover:text-white transition-all text-[11px]"
+                    >
+                      @{dev.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quick direct landing CTAs */}
+              <div id="hero-actions" className="flex flex-wrap items-center justify-center gap-3 pt-4">
                 <button 
                   onClick={() => setCurrentTab("compare")}
-                  className="px-5 py-3 bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold font-mono tracking-wide uppercase rounded-xl transition-all flex items-center gap-1.5 active:scale-95"
+                  className="px-5 py-2.5 bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold font-mono tracking-wide uppercase rounded-xl transition-all flex items-center gap-1.5 active:scale-95"
                 >
                   <Users className="w-3.5 h-3.5 text-brand-blue" />
-                  Compare Profiles
+                  Compare 2 Profiles
                 </button>
                 <button 
                   onClick={() => setCurrentTab("leaderboard")}
-                  className="px-5 py-3 bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold font-mono tracking-wide uppercase rounded-xl transition-all flex items-center gap-1.5 active:scale-95"
+                  className="px-5 py-2.5 bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold font-mono tracking-wide uppercase rounded-xl transition-all flex items-center gap-1.5 active:scale-95"
                 >
                   <Award className="w-3.5 h-3.5 text-brand-amber" />
-                  View Rankings
+                  Global Leaderboard
                 </button>
-              </div>
-            </div>
-
-            {/* Feature Highlights Grid */}
-            <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div 
-                onClick={() => setCurrentTab("score")} 
-                className="bg-gray-900/40 border border-gray-800 hover:border-brand-purple/50 p-6 rounded-2xl transition-all cursor-pointer group relative overflow-hidden"
-              >
-                <div className="w-10 h-10 rounded-xl bg-brand-purple/10 border border-brand-purple/30 flex items-center justify-center text-brand-purple mb-4 group-hover:scale-110 transition-transform">
-                  <Activity className="w-5 h-5" />
-                </div>
-                <h3 className="font-display font-bold text-white text-base mb-2 group-hover:text-brand-purple transition-colors">
-                  0-1000 Developer Score
-                </h3>
-                <p className="text-xs text-gray-400 leading-relaxed mb-4">
-                  Quantify profile completeness, star reach, commit frequency, pull request activity, and open-source impact.
-                </p>
-                <span className="text-xs font-mono font-bold text-brand-purple flex items-center gap-1">
-                  Start Analysis <ChevronRight className="w-3.5 h-3.5" />
-                </span>
-              </div>
-
-              <div 
-                onClick={() => setCurrentTab("compare")} 
-                className="bg-gray-900/40 border border-gray-800 hover:border-brand-blue/50 p-6 rounded-2xl transition-all cursor-pointer group relative overflow-hidden"
-              >
-                <div className="w-10 h-10 rounded-xl bg-brand-blue/10 border border-brand-blue/30 flex items-center justify-center text-brand-blue mb-4 group-hover:scale-110 transition-transform">
-                  <Users className="w-5 h-5" />
-                </div>
-                <h3 className="font-display font-bold text-white text-base mb-2 group-hover:text-brand-blue transition-colors">
-                  Side-by-Side Comparison
-                </h3>
-                <p className="text-xs text-gray-400 leading-relaxed mb-4">
-                  Benchmark two GitHub profiles head-to-head. Compare metrics, stars, contributions, and determine the winner.
-                </p>
-                <span className="text-xs font-mono font-bold text-brand-blue flex items-center gap-1">
-                  Compare Developers <ChevronRight className="w-3.5 h-3.5" />
-                </span>
-              </div>
-
-              <div 
-                onClick={() => setCurrentTab("leaderboard")} 
-                className="bg-gray-900/40 border border-gray-800 hover:border-brand-amber/50 p-6 rounded-2xl transition-all cursor-pointer group relative overflow-hidden"
-              >
-                <div className="w-10 h-10 rounded-xl bg-brand-amber/10 border border-brand-amber/30 flex items-center justify-center text-brand-amber mb-4 group-hover:scale-110 transition-transform">
-                  <Award className="w-5 h-5" />
-                </div>
-                <h3 className="font-display font-bold text-white text-base mb-2 group-hover:text-brand-amber transition-colors">
-                  Global & College Rankings
-                </h3>
-                <p className="text-xs text-gray-400 leading-relaxed mb-4">
-                  Explore leaderboard rankings across global developers, colleges, and countries with real-time percentile distribution.
-                </p>
-                <span className="text-xs font-mono font-bold text-brand-amber flex items-center gap-1">
-                  View Leaderboard <ChevronRight className="w-3.5 h-3.5" />
-                </span>
-              </div>
-            </div>
-
-            {/* Quick Metrics Categories Description */}
-            <div className="max-w-5xl mx-auto space-y-6 pt-4">
-              <h3 className="text-sm font-mono text-center uppercase tracking-widest text-[#8A8A8A]">
-                Score weight boundaries (1000 pts)
-              </h3>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-                <div className="bg-gray-900/35 border border-gray-800 p-4 rounded-xl text-center">
-                  <span className="block text-xl font-display font-black text-white">100</span>
-                  <span className="block text-xs font-mono text-gray-500 mt-1">Profile Docs</span>
-                </div>
-                <div className="bg-gray-900/35 border border-gray-800 p-4 rounded-xl text-center">
-                  <span className="block text-xl font-display font-black text-white">100</span>
-                  <span className="block text-xs font-mono text-gray-500 mt-1">Social reach</span>
-                </div>
-                <div className="bg-gray-900/35 border border-gray-800 p-4 rounded-xl text-center">
-                  <span className="block text-xl font-display font-black text-white">200</span>
-                  <span className="block text-xs font-mono text-gray-500 mt-1">Repo Quality</span>
-                </div>
-                <div className="bg-gray-900/35 border border-gray-800 p-4 rounded-xl text-center">
-                  <span className="block text-xl font-display font-black text-white">250</span>
-                  <span className="block text-xs font-mono text-gray-500 mt-1">Commit Volume</span>
-                </div>
-                <div className="bg-gray-900/35 border border-gray-800 p-4 rounded-xl text-center">
-                  <span className="block text-xl font-display font-black text-white">150</span>
-                  <span className="block text-xs font-mono text-gray-500 mt-1">Open Source</span>
-                </div>
-                <div className="bg-gray-900/35 border border-gray-800 p-4 rounded-xl text-center">
-                  <span className="block text-xl font-display font-black text-white">100</span>
-                  <span className="block text-xs font-mono text-gray-500 mt-1">Consistency</span>
-                </div>
-                <div className="bg-gray-900/35 border border-gray-800 p-4 rounded-xl text-center">
-                  <span className="block text-xl font-display font-black text-white">100</span>
-                  <span className="block text-xs font-mono text-gray-500 mt-1">Community</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Scorecard CTA Banner */}
-            <div className="max-w-4xl mx-auto bg-gradient-to-r from-brand-purple/20 via-brand-blue/20 to-brand-green/10 border border-brand-purple/30 rounded-3xl p-8 sm:p-10 text-center relative overflow-hidden">
-              <div className="relative z-10 space-y-4">
-                <h3 className="text-2xl sm:text-3xl font-display font-black text-white">
-                  Ready to check your developer score?
-                </h3>
-                <p className="text-gray-300 text-sm max-w-xl mx-auto">
-                  Instant AI review for internships, placement resumes, freelance pitches, and open-source programs.
-                </p>
-                <button
-                  onClick={() => setCurrentTab("score")}
-                  className="mt-2 inline-flex items-center gap-2 px-7 py-3.5 bg-gradient-to-r from-brand-purple to-brand-blue text-white font-bold font-mono text-sm uppercase rounded-xl hover:opacity-95 shadow-xl shadow-brand-purple/30 transition-all active:scale-95"
+                <button 
+                  onClick={() => setCurrentTab("about")}
+                  className="px-5 py-2.5 bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold font-mono tracking-wide uppercase rounded-xl transition-all flex items-center gap-1.5 active:scale-95"
                 >
-                  <Sparkles className="w-4 h-4" />
-                  Get Your Scorecard Now
-                  <ArrowRight className="w-4 h-4" />
+                  <Info className="w-3.5 h-3.5 text-brand-green" />
+                  Scoring Algorithm
                 </button>
+              </div>
+            </div>
+
+            {/* Live Stats Overview Banner */}
+            <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-gradient-to-r from-gray-900/40 via-gray-900/60 to-gray-900/40 border border-gray-800 rounded-2xl text-center">
+              <div className="space-y-1">
+                <p className="text-2xl sm:text-3xl font-display font-black text-white">0–1000</p>
+                <p className="text-xs font-mono text-gray-400">Score Range</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-2xl sm:text-3xl font-display font-black text-brand-purple">7 Pillars</p>
+                <p className="text-xs font-mono text-gray-400">Evaluation Categories</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-2xl sm:text-3xl font-display font-black text-brand-blue">&lt; 2 Sec</p>
+                <p className="text-xs font-mono text-gray-400">Instant Analysis</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-2xl sm:text-3xl font-display font-black text-brand-green">100% Free</p>
+                <p className="text-xs font-mono text-gray-400">Open Source</p>
+              </div>
+            </div>
+
+            {/* 3-Step Workflow: How It Works */}
+            <div className="max-w-5xl mx-auto space-y-8">
+              <div className="text-center space-y-2">
+                <span className="text-xs font-mono text-brand-purple uppercase tracking-widest font-bold">Workflow Process</span>
+                <h2 className="text-2xl sm:text-3xl font-display font-black text-white">How GitScore Evaluates Profiles</h2>
+                <p className="text-sm text-gray-400 max-w-lg mx-auto">
+                  A multi-stage real-time calculation pipeline backed by GitHub REST data and quantitative metrics.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-gray-900/30 border border-gray-800 p-6 rounded-2xl space-y-4 relative">
+                  <div className="w-10 h-10 rounded-xl bg-brand-purple/10 border border-brand-purple/30 flex items-center justify-center font-mono font-black text-brand-purple text-sm">
+                    01
+                  </div>
+                  <h3 className="font-display font-bold text-white text-base">Public Data Ingestion</h3>
+                  <p className="text-xs text-gray-400 leading-relaxed">
+                    Fetches public repositories, star counts, fork activity, license metadata, account age, and contribution recency directly from GitHub API.
+                  </p>
+                </div>
+
+                <div className="bg-gray-900/30 border border-gray-800 p-6 rounded-2xl space-y-4 relative">
+                  <div className="w-10 h-10 rounded-xl bg-brand-blue/10 border border-brand-blue/30 flex items-center justify-center font-mono font-black text-brand-blue text-sm">
+                    02
+                  </div>
+                  <h3 className="font-display font-bold text-white text-base">7-Pillar Scoring Engine</h3>
+                  <p className="text-xs text-gray-400 leading-relaxed">
+                    Applies mathematical scoring curves across repository quality, commit volume, documentation, community impact, and open-source engagement.
+                  </p>
+                </div>
+
+                <div className="bg-gray-900/30 border border-gray-800 p-6 rounded-2xl space-y-4 relative">
+                  <div className="w-10 h-10 rounded-xl bg-brand-green/10 border border-brand-green/30 flex items-center justify-center font-mono font-black text-brand-green text-sm">
+                    03
+                  </div>
+                  <h3 className="font-display font-bold text-white text-base">PDF & Career Insights</h3>
+                  <p className="text-xs text-gray-400 leading-relaxed">
+                    Generates radar graphs, percentile ratings (S+ to D), suitable developer role archetypes, and exportable full-color PDF scorecards.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Deep 7 Scoring Pillars Detailed Breakdown */}
+            <div className="max-w-5xl mx-auto space-y-8">
+              <div className="text-center space-y-2">
+                <span className="text-xs font-mono text-brand-blue uppercase tracking-widest font-bold">1,000 Points Breakdown</span>
+                <h2 className="text-2xl sm:text-3xl font-display font-black text-white">The 7 Quantitative Pillars</h2>
+                <p className="text-sm text-gray-400 max-w-lg mx-auto">
+                  Every point is earned through verified repository activity and development rigor.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {[
+                  {
+                    title: "Contribution Activity",
+                    pts: "250 pts",
+                    weight: "25%",
+                    icon: Activity,
+                    color: "text-brand-purple",
+                    border: "border-brand-purple/30",
+                    bg: "bg-brand-purple/10",
+                    desc: "Commit velocity, active push recency in the last 30-90 days, public repository volume, and sustained developer momentum."
+                  },
+                  {
+                    title: "Repository Quality",
+                    pts: "200 pts",
+                    weight: "20%",
+                    icon: Folder,
+                    color: "text-brand-blue",
+                    border: "border-brand-blue/30",
+                    bg: "bg-brand-blue/10",
+                    desc: "Stargazers count, comprehensive README documentation, open-source licenses (MIT/Apache), and multi-language diversity."
+                  },
+                  {
+                    title: "Open Source Engagement",
+                    pts: "150 pts",
+                    weight: "15%",
+                    icon: GitPullRequest,
+                    color: "text-brand-green",
+                    border: "border-brand-green/30",
+                    bg: "bg-brand-green/10",
+                    desc: "Forks received, topic categorization tags, public collaborations, and open-source community contributions."
+                  },
+                  {
+                    title: "Profile Completeness",
+                    pts: "100 pts",
+                    weight: "10%",
+                    icon: CheckCircle2,
+                    color: "text-brand-amber",
+                    border: "border-brand-amber/30",
+                    bg: "bg-brand-amber/10",
+                    desc: "Bio completeness, portfolio website links, verified location, avatar presence, and social profile links."
+                  },
+                  {
+                    title: "Follower Reach",
+                    pts: "100 pts",
+                    weight: "10%",
+                    icon: Users,
+                    color: "text-pink-400",
+                    border: "border-pink-400/30",
+                    bg: "bg-pink-400/10",
+                    desc: "Logarithmically scaled follower reach and developer network influence across the global GitHub ecosystem."
+                  },
+                  {
+                    title: "Code Consistency",
+                    pts: "100 pts",
+                    weight: "10%",
+                    icon: Flame,
+                    color: "text-orange-400",
+                    border: "border-orange-400/30",
+                    bg: "bg-orange-400/10",
+                    desc: "Ratio of updated projects over stagnant repositories and account maturity across multiple years."
+                  },
+                  {
+                    title: "Community Impact",
+                    pts: "100 pts",
+                    weight: "10%",
+                    icon: Zap,
+                    color: "text-cyan-400",
+                    border: "border-cyan-400/30",
+                    bg: "bg-cyan-400/10",
+                    desc: "Combined reach formula aggregating total stars, total forks, and downstream developer adoption."
+                  }
+                ].map((pillar) => {
+                  const Icon = pillar.icon;
+                  return (
+                    <div key={pillar.title} className="bg-gray-900/30 border border-gray-800 p-5 rounded-2xl space-y-3 hover:border-gray-700 transition-all">
+                      <div className="flex items-center justify-between">
+                        <div className={`w-9 h-9 rounded-xl ${pillar.bg} border ${pillar.border} flex items-center justify-center ${pillar.color}`}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div className="text-right font-mono">
+                          <span className={`text-xs font-bold ${pillar.color}`}>{pillar.pts}</span>
+                          <span className="text-[10px] text-gray-500 block">Weight: {pillar.weight}</span>
+                        </div>
+                      </div>
+                      <h4 className="font-display font-bold text-white text-sm">{pillar.title}</h4>
+                      <p className="text-xs text-gray-400 leading-relaxed">{pillar.desc}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Core Feature Matrix */}
+            <div className="max-w-5xl mx-auto space-y-8">
+              <div className="text-center space-y-2">
+                <span className="text-xs font-mono text-brand-green uppercase tracking-widest font-bold">Platform Capabilities</span>
+                <h2 className="text-2xl sm:text-3xl font-display font-black text-white">Built for Developers & Recruiters</h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div 
+                  onClick={() => setCurrentTab("score")} 
+                  className="bg-gray-900/40 border border-gray-800 hover:border-brand-purple/50 p-6 rounded-2xl transition-all cursor-pointer group relative overflow-hidden"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-brand-purple/10 border border-brand-purple/30 flex items-center justify-center text-brand-purple mb-4 group-hover:scale-110 transition-transform">
+                    <Activity className="w-5 h-5" />
+                  </div>
+                  <h3 className="font-display font-bold text-white text-base mb-2 group-hover:text-brand-purple transition-colors">
+                    Scorecard & Radar Graph
+                  </h3>
+                  <p className="text-xs text-gray-400 leading-relaxed mb-4">
+                    Interactive radar visualization, percentile rating, and one-click PDF scorecard download formatted for placement resumes.
+                  </p>
+                  <span className="text-xs font-mono font-bold text-brand-purple flex items-center gap-1">
+                    Generate Scorecard <ChevronRight className="w-3.5 h-3.5" />
+                  </span>
+                </div>
+
+                <div 
+                  onClick={() => setCurrentTab("compare")} 
+                  className="bg-gray-900/40 border border-gray-800 hover:border-brand-blue/50 p-6 rounded-2xl transition-all cursor-pointer group relative overflow-hidden"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-brand-blue/10 border border-brand-blue/30 flex items-center justify-center text-brand-blue mb-4 group-hover:scale-110 transition-transform">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <h3 className="font-display font-bold text-white text-base mb-2 group-hover:text-brand-blue transition-colors">
+                    Side-by-Side Developer Duels
+                  </h3>
+                  <p className="text-xs text-gray-400 leading-relaxed mb-4">
+                    Pit two profiles head-to-head. Compare metrics, stars, contributions, and visit profiles directly.
+                  </p>
+                  <span className="text-xs font-mono font-bold text-brand-blue flex items-center gap-1">
+                    Compare Developers <ChevronRight className="w-3.5 h-3.5" />
+                  </span>
+                </div>
+
+                <div 
+                  onClick={() => setCurrentTab("leaderboard")} 
+                  className="bg-gray-900/40 border border-gray-800 hover:border-brand-amber/50 p-6 rounded-2xl transition-all cursor-pointer group relative overflow-hidden"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-brand-amber/10 border border-brand-amber/30 flex items-center justify-center text-brand-amber mb-4 group-hover:scale-110 transition-transform">
+                    <Award className="w-5 h-5" />
+                  </div>
+                  <h3 className="font-display font-bold text-white text-base mb-2 group-hover:text-brand-amber transition-colors">
+                    Global & College Rankings
+                  </h3>
+                  <p className="text-xs text-gray-400 leading-relaxed mb-4">
+                    Explore rankings across global developers, colleges, and countries with percentile distributions.
+                  </p>
+                  <span className="text-xs font-mono font-bold text-brand-amber flex items-center gap-1">
+                    View Rankings <ChevronRight className="w-3.5 h-3.5" />
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -771,7 +940,7 @@ export default function App() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Award className="w-5 h-5 text-brand-purple" />
-                  <h3 className="font-display font-bold text-lg text-white">Top Rated Profiles</h3>
+                  <h3 className="font-display font-bold text-lg text-white">Top Rated Developers</h3>
                 </div>
                 <button 
                   onClick={() => setCurrentTab("leaderboard")}
@@ -809,7 +978,7 @@ export default function App() {
 
                       <button
                         onClick={() => triggerUserFromLeaderboard(item.username)}
-                        className="px-3 py-1.5 bg-gray-800 text-gray-300 font-mono text-xs font-semibold rounded-lg hover:bg-brand-purple hover:text-white transition-all flex items-center gap-1"
+                        className="px-3 py-1.5 bg-gray-800 text-gray-300 font-mono text-xs font-semibold rounded-lg hover:bg-brand-purple hover:text-white transition-all flex items-center gap-1 cursor-pointer"
                       >
                         Check
                         <ArrowRight className="w-3 h-3" />
@@ -817,6 +986,63 @@ export default function App() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* FAQ Accordion Section */}
+            <div className="max-w-3xl mx-auto space-y-6">
+              <div className="text-center space-y-2">
+                <span className="text-xs font-mono text-brand-amber uppercase tracking-widest font-bold">Frequently Asked Questions</span>
+                <h3 className="text-2xl font-display font-black text-white">Got Questions?</h3>
+              </div>
+
+              <div className="space-y-3">
+                {[
+                  {
+                    q: "Do you require private repository access or account credentials?",
+                    a: "No. GitScore only interacts with public GitHub endpoints. We never ask for passwords, private repository permissions, or personal credentials."
+                  },
+                  {
+                    q: "How can I improve my GitHub Scorecard?",
+                    a: "Add open-source licenses (MIT, Apache) and comprehensive READMEs to repositories, maintain consistent commit activity, tag topics on repos, and fill out your bio and portfolio links."
+                  },
+                  {
+                    q: "Can I attach the PDF Scorecard to my resume?",
+                    a: "Yes! The 'Print Scorecard PDF' feature produces an official, publication-ready vector PDF report designed specifically for technical placement resumes and job applications."
+                  },
+                  {
+                    q: "How are developer grades (S+, S, A+, etc.) assigned?",
+                    a: "Grades correspond to overall points: S+ (900–1000), S (800–899), A+ (700–799), A (600–699), B+ (500–599), B (400–499), C (300–399), and D (<300)."
+                  }
+                ].map((faq, idx) => (
+                  <div key={idx} className="bg-gray-900/40 border border-gray-800 p-5 rounded-2xl space-y-2">
+                    <h4 className="font-display font-bold text-sm text-white flex items-center gap-2">
+                      <HelpCircle className="w-4 h-4 text-brand-purple shrink-0" />
+                      {faq.q}
+                    </h4>
+                    <p className="text-xs text-gray-400 leading-relaxed pl-6">{faq.a}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Final CTA Banner */}
+            <div className="max-w-4xl mx-auto bg-gradient-to-r from-brand-purple/20 via-brand-blue/20 to-brand-green/10 border border-brand-purple/30 rounded-3xl p-8 sm:p-10 text-center relative overflow-hidden">
+              <div className="relative z-10 space-y-4">
+                <h3 className="text-2xl sm:text-3xl font-display font-black text-white">
+                  Ready to test your developer standing?
+                </h3>
+                <p className="text-gray-300 text-sm max-w-xl mx-auto">
+                  Get your free 0-1000 score, deep repo breakdown, and career role recommendations in seconds.
+                </p>
+                <button
+                  onClick={() => setCurrentTab("score")}
+                  className="mt-2 inline-flex items-center gap-2 px-7 py-3.5 bg-gradient-to-r from-brand-purple to-brand-blue text-white font-bold font-mono text-sm uppercase rounded-xl hover:opacity-95 shadow-xl shadow-brand-purple/30 transition-all active:scale-95 cursor-pointer"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Get Your Scorecard Now
+                  <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
 
