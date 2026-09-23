@@ -30,7 +30,8 @@ import {
   ArrowRight,
   Briefcase,
   ChevronRight,
-  HelpCircle
+  HelpCircle,
+  ExternalLink
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { GithubProfile, RepoAnalysis, Scorecard, ScorecardReport, LeaderboardEntry } from "./types";
@@ -834,6 +835,16 @@ export default function App() {
               </div>
 
               <div className="flex flex-wrap gap-2.5">
+                <a 
+                  href={`https://github.com/${currentReport.profile.username}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-4 py-2 bg-gray-900 border border-gray-700 hover:border-gray-500 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 hover:bg-gray-800 transition-colors shadow-sm"
+                >
+                  <Github className="w-3.5 h-3.5 text-brand-purple" />
+                  Visit Profile
+                  <ExternalLink className="w-3 h-3 text-gray-400" />
+                </a>
                 <button 
                   onClick={handlePrintCard}
                   className="px-4 py-2 bg-brand-blue text-white font-bold rounded-lg text-xs flex items-center gap-1.5 hover:bg-brand-blue/90 transition-colors shadow-md shadow-brand-blue/15"
@@ -879,9 +890,21 @@ export default function App() {
                     {currentReport.profile.name || currentReport.profile.username}
                   </h2>
                   
-                  <p className="font-mono text-sm text-brand-blue">
-                    @{currentReport.profile.username}
-                  </p>
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
+                    <p className="font-mono text-sm text-brand-blue font-semibold">
+                      @{currentReport.profile.username}
+                    </p>
+                    <a
+                      href={`https://github.com/${currentReport.profile.username}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-800/80 hover:bg-gray-750 text-[11px] font-mono text-gray-300 hover:text-white border border-gray-700/80 transition-all hover:border-gray-600"
+                    >
+                      <Github className="w-3 h-3 text-brand-purple" />
+                      Visit Profile
+                      <ExternalLink className="w-2.5 h-2.5 text-gray-400" />
+                    </a>
+                  </div>
 
                   {currentReport.profile.bio && (
                     <p className="text-sm text-gray-400 max-w-xl font-sans font-medium italic">
