@@ -143,7 +143,7 @@ function getGeminiClient(): GoogleGenAI {
       apiKey: key || "MOCK_KEY",
       httpOptions: {
         headers: {
-          'User-Agent': 'aistudio-build',
+          'User-Agent': 'gitscore-app',
         }
       }
     });

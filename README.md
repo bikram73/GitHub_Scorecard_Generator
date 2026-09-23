@@ -13,7 +13,7 @@
   <strong>Transform public GitHub profiles into quantifiable 1000-point developer scorecards, AI code quality audits, side-by-side comparisons, and recruiter-ready career insights.</strong>
 </p>
 
-[✨ Live Demo](https://ai.studio/build) • [🚀 Features](#-key-features) • [🛠️ Tech Stack](#-tech-stack) • [📦 Installation](#-quick-start--installation) • [☁️ Netlify Deployment](#-netlify-deployment) • [📐 Scoring Algorithm](#-1000-point-scoring-algorithm)
+[🚀 Features](#-key-features) • [🛠️ Tech Stack](#-tech-stack) • [📦 Installation](#-quick-start--installation) • [☁️ Netlify Deployment](#-netlify-deployment) • [📐 Scoring Algorithm](#-1000-point-scoring-algorithm)
 
 </div>
 
@@ -149,7 +149,7 @@ The scorecard calculates an objective developer score out of **1,000 points** di
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (v18.0 or higher)
 - [npm](https://www.npmjs.com/) or [bun](https://bun.sh/)
-- A Google Gemini API Key ([Get one free at Google AI Studio](https://aistudio.google.com/))
+- A Google Gemini API Key ([Get one free at Google AI](https://ai.google.dev/))
 
 ### 1. Clone the repository
 ```bash

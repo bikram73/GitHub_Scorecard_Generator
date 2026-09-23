@@ -192,7 +192,7 @@ export default function App() {
 
   // Create badge snippet copy action
   const handleCopyBadge = (username: string, score: number, grade: string) => {
-    const badgeMarkdown = `[![GitHub Scorecard](https://img.shields.io/badge/GitHub_Score-${score}/1000--${grade}-8b5cf6?style=for-the-badge&logo=github)](https://ai.studio/build)`;
+    const badgeMarkdown = `[![GitHub Scorecard](https://img.shields.io/badge/GitHub_Score-${score}/1000--${grade}-8b5cf6?style=for-the-badge&logo=github)](https://github.com/${username})`;
     navigator.clipboard.writeText(badgeMarkdown);
     setCopiedText(`markdown-${username}`);
     setTimeout(() => setCopiedText(null), 2500);
@@ -1706,13 +1706,13 @@ export default function App() {
       {/* Styled Footer */}
       <footer className="border-t border-gray-800 bg-[#0B1020]/25 py-8 mt-24 text-center text-xs text-gray-500 font-mono print:hidden">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p>© {new Date().getFullYear()} GitHub Scorecard Generator. Built with Gemini AI. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} GitScore — GitHub Scorecard Generator. Powered by Gemini AI. All rights reserved.</p>
           <div className="flex gap-6">
-            <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">GitHub API docs</a>
+            <a href="https://docs.github.com/en/rest" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">GitHub API docs</a>
             <span>•</span>
             <a onClick={() => setCurrentTab("about")} className="hover:text-white transition-colors cursor-pointer">Score calculation rules</a>
             <span>•</span>
-            <a href="https://ai.studio/build" className="hover:text-white transition-colors">Google AI Studio</a>
+            <a onClick={() => setCurrentTab("leaderboard")} className="hover:text-white transition-colors cursor-pointer">Global Rankings</a>
           </div>
         </div>
       </footer>
