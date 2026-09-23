@@ -775,7 +775,7 @@ export default function App() {
               <div className="pt-2 border-t border-gray-800/80 flex flex-wrap items-center justify-between gap-3 text-xs text-gray-400 font-mono relative z-10">
                 <span className="text-gray-500">Popular developer presets:</span>
                 <div className="flex flex-wrap gap-2">
-                  {["torvalds", "yyx990803", "gvanrossum", "BikramManna"].map((sample) => (
+                  {["torvalds", "yyx990803", "gvanrossum", "bikram73"].map((sample) => (
                     <button 
                       key={sample}
                       type="button"

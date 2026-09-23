@@ -47,7 +47,7 @@ const DEFAULT_DB: DbData = {
       country: "USA"
     },
     {
-      username: "BikramManna",
+      username: "bikram73",
       name: "Bikram Manna",
       avatarUrl: "https://avatars.githubusercontent.com/u/61085674?v=4",
       overallScore: 842,
@@ -174,7 +174,7 @@ function calculatePercentile(score: number): number {
   return 85.0;
 }
 
-async function fetchWithTimeout(url: string, options: any = {}, timeoutMs = 4000) {
+async function fetchWithTimeout(url: string, options: any = {}, timeoutMs = 8000) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -383,7 +383,7 @@ export async function generateScorecardReport(username: string): Promise<any> {
       - communityImpact (0-100)
     `;
   } else {
-    const strippedRepos = gitRepos.slice(0, 10).map(r => ({
+    const strippedRepos = gitRepos.slice(0, 4).map(r => ({
       name: r.name,
       description: r.description || "No description",
       stars: r.stargazers_count,
@@ -443,7 +443,7 @@ export async function generateScorecardReport(username: string): Promise<any> {
       });
 
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("GEMINI_TIMEOUT")), 5000)
+        setTimeout(() => reject(new Error("GEMINI_TIMEOUT")), 25000)
       );
 
       const response: any = await Promise.race([geminiCall, timeoutPromise]);
