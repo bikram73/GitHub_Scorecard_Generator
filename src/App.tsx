@@ -1639,8 +1639,8 @@ export default function App() {
             {comparisonResult && (
               <div className="space-y-8 animate-fade-in">
                 
-                {/* Winner display card banner banner */}
-                <div className="bg-gradient-to-r from-brand-purple/20 via-brand-blue/10 to-brand-purple/20 border border-brand-purple/35 rounded-2xl p-6 text-center shadow-lg max-w-xl mx-auto">
+                {/* Winner display card banner */}
+                <div className="bg-gradient-to-r from-brand-purple/20 via-brand-blue/10 to-brand-purple/20 border border-brand-purple/35 rounded-2xl p-6 text-center shadow-lg max-w-2xl mx-auto">
                   <span className="text-xs font-mono text-brand-green uppercase tracking-widest font-black mb-1.5 block">Duel Complete</span>
                   <h2 className="text-2xl font-display font-black text-white">
                     🏆 {comparisonResult.user1.scorecard.overallScore >= comparisonResult.user2.scorecard.overallScore 
@@ -1648,118 +1648,405 @@ export default function App() {
                       : comparisonResult.user2.profile.name || comparisonResult.user2.profile.username} Wins!
                   </h2>
                   <p className="text-xs text-gray-400 mt-1 font-mono">
-                    Evaluation reflects overall scorecard superiority inside distributed coding categories.
+                    Score differential: {Math.abs(comparisonResult.user1.scorecard.overallScore - comparisonResult.user2.scorecard.overallScore)} points across 7 developer evaluation categories.
                   </p>
                 </div>
 
                 {/* Stat cards columns split */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
                   {/* profile 1 column summary */}
-                  <div className="bg-gray-900/20 border border-gray-800 rounded-2xl p-6 space-y-6">
-                    <div className="flex items-center gap-4 border-b border-gray-800/80 pb-4">
-                      <img src={comparisonResult.user1.profile.avatarUrl} alt={comparisonResult.user1.profile.username} className="w-12 h-12 rounded-full border border-gray-700 bg-gray-900 object-cover" />
-                      <div>
-                        <h3 className="font-display font-bold text-lg text-white leading-tight">
-                          {comparisonResult.user1.profile.name || comparisonResult.user1.profile.username}
-                        </h3>
-                        <p className="font-mono text-xs text-brand-blue">@{comparisonResult.user1.profile.username}</p>
+                  <div className="bg-gray-900/40 border border-gray-800 rounded-2xl p-6 space-y-6 flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <div className="flex items-start justify-between gap-4 border-b border-gray-800/80 pb-4">
+                        <div className="flex items-center gap-3.5">
+                          <img src={comparisonResult.user1.profile.avatarUrl} alt={comparisonResult.user1.profile.username} className="w-14 h-14 rounded-2xl border-2 border-brand-purple/50 bg-gray-900 object-cover shadow-md" />
+                          <div>
+                            <h3 className="font-display font-bold text-lg text-white leading-tight">
+                              {comparisonResult.user1.profile.name || comparisonResult.user1.profile.username}
+                            </h3>
+                            <p className="font-mono text-xs text-brand-blue">@{comparisonResult.user1.profile.username}</p>
+                            {comparisonResult.user1.profile.location && (
+                              <p className="text-[11px] text-gray-400 flex items-center gap-1 mt-0.5">
+                                <MapPin className="w-3 h-3 text-gray-500" />
+                                {comparisonResult.user1.profile.location}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <span className={`text-xs font-mono font-bold px-2.5 py-1 rounded-lg border uppercase ${getGradeMeta(comparisonResult.user1.scorecard.grade).bg} ${getGradeMeta(comparisonResult.user1.scorecard.grade).text} ${getGradeMeta(comparisonResult.user1.scorecard.grade).border}`}>
+                          {comparisonResult.user1.scorecard.grade} Grade
+                        </span>
+                      </div>
+
+                      {/* Bio */}
+                      {comparisonResult.user1.profile.bio && (
+                        <p className="text-xs text-gray-300 line-clamp-2 leading-relaxed italic bg-black/30 p-2.5 rounded-lg border border-gray-850">
+                          "{comparisonResult.user1.profile.bio}"
+                        </p>
+                      )}
+
+                      {/* Score Highlight Box */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-black/50 border border-gray-850 p-3.5 rounded-xl text-center">
+                          <p className="text-[10px] font-mono text-gray-500 uppercase">Scorecard Index</p>
+                          <p className="text-3xl font-display font-black text-white mt-1">
+                            {comparisonResult.user1.scorecard.overallScore}
+                            <span className="text-xs font-mono text-gray-500 font-normal">/1000</span>
+                          </p>
+                        </div>
+
+                        <div className="bg-black/50 border border-gray-850 p-3.5 rounded-xl text-center">
+                          <p className="text-[10px] font-mono text-gray-500 uppercase">Skill Level</p>
+                          <p className="text-sm font-display font-bold text-brand-purple mt-2">
+                            {comparisonResult.user1.scorecard.careerInsights?.skillLevel || "Advanced"}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Key Profile Stats */}
+                      <div className="grid grid-cols-3 gap-2 text-center pt-1 font-mono text-xs">
+                        <div className="bg-gray-900/60 p-2 rounded-lg border border-gray-800">
+                          <p className="text-[10px] text-gray-500">Repositories</p>
+                          <p className="font-bold text-white text-sm">{comparisonResult.user1.profile.publicRepos}</p>
+                        </div>
+                        <div className="bg-gray-900/60 p-2 rounded-lg border border-gray-800">
+                          <p className="text-[10px] text-gray-500">Followers</p>
+                          <p className="font-bold text-brand-amber text-sm">{comparisonResult.user1.profile.followers}</p>
+                        </div>
+                        <div className="bg-gray-900/60 p-2 rounded-lg border border-gray-800">
+                          <p className="text-[10px] text-gray-500">Following</p>
+                          <p className="font-bold text-gray-400 text-sm">{comparisonResult.user1.profile.following}</p>
+                        </div>
+                      </div>
+
+                      {/* breakdown metrics summary */}
+                      <div className="space-y-2.5 pt-2 border-t border-gray-800/80">
+                        <div className="flex justify-between text-xs font-mono">
+                          <span className="text-gray-400">Profile Completeness</span>
+                          <span className="text-white font-bold">{comparisonResult.user1.scorecard.metrics.profileCompleteness}/100</span>
+                        </div>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span className="text-gray-400">Repository Quality</span>
+                          <span className="text-white font-bold">{comparisonResult.user1.scorecard.metrics.repositoryQuality}/200</span>
+                        </div>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span className="text-gray-400">Contribution Activity</span>
+                          <span className="text-white font-bold">{comparisonResult.user1.scorecard.metrics.contributionActivity}/250</span>
+                        </div>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span className="text-gray-400">Open Source Engagement</span>
+                          <span className="text-white font-bold">{comparisonResult.user1.scorecard.metrics.openSourceEngagement}/150</span>
+                        </div>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span className="text-gray-400">Code Consistency</span>
+                          <span className="text-white font-bold">{comparisonResult.user1.scorecard.metrics.codeConsistency}/100</span>
+                        </div>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span className="text-gray-400">Community Impact</span>
+                          <span className="text-white font-bold">{comparisonResult.user1.scorecard.metrics.communityImpact}/100</span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-black/40 border border-gray-850 p-4 rounded-xl text-center">
-                        <p className="text-[10px] font-mono text-gray-500 uppercase">Dev Score</p>
-                        <p className="text-3xl font-display font-black text-white mt-1">
-                          {comparisonResult.user1.scorecard.overallScore}
-                        </p>
-                      </div>
-
-                      <div className="bg-black/40 border border-gray-850 p-4 rounded-xl text-center">
-                        <p className="text-[10px] font-mono text-gray-500 uppercase">Grade</p>
-                        <p className={`text-3xl font-mono font-black mt-1 ${getGradeMeta(comparisonResult.user1.scorecard.grade).text}`}>
-                          {comparisonResult.user1.scorecard.grade}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* breakdown metrics summary */}
-                    <div className="space-y-3 pt-2">
-                      <div className="flex justify-between text-xs font-mono">
-                        <span className="text-gray-400">Profile completeness</span>
-                        <span className="text-white font-bold">{comparisonResult.user1.scorecard.metrics.profileCompleteness}/100</span>
-                      </div>
-                      <div className="flex justify-between text-xs font-mono">
-                        <span className="text-gray-400">Total repos</span>
-                        <span className="text-white font-bold">{comparisonResult.user1.profile.publicRepos}</span>
-                      </div>
-                      <div className="flex justify-between text-xs font-mono">
-                        <span className="text-gray-400">Followers metrics</span>
-                        <span className="text-white font-bold">{comparisonResult.user1.profile.followers}</span>
-                      </div>
-                      <div className="flex justify-between text-xs font-mono">
-                        <span className="text-gray-400">Repo quality</span>
-                        <span className="text-white font-bold">{comparisonResult.user1.scorecard.metrics.repositoryQuality}/200</span>
-                      </div>
-                      <div className="flex justify-between text-xs font-mono">
-                        <span className="text-gray-400">Contribution index</span>
-                        <span className="text-white font-bold">{comparisonResult.user1.scorecard.metrics.contributionActivity}/250</span>
-                      </div>
+                    {/* Action buttons */}
+                    <div className="pt-4 border-t border-gray-800 flex flex-wrap gap-2">
+                      <a 
+                        href={`https://github.com/${comparisonResult.user1.profile.username}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 py-2.5 px-3 bg-gray-800 hover:bg-gray-700 text-white text-xs font-bold font-mono rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95 text-center"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5 text-brand-blue" />
+                        Visit Profile
+                      </a>
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          setCurrentReport(comparisonResult.user1);
+                          setCurrentTab("dashboard");
+                        }}
+                        className="py-2.5 px-3 bg-brand-purple/20 hover:bg-brand-purple/30 border border-brand-purple/40 text-brand-purple text-xs font-bold font-mono rounded-xl transition-all flex items-center justify-center gap-1.5 active:scale-95"
+                      >
+                        <Sparkles className="w-3.5 h-3.5" />
+                        View Scorecard
+                      </button>
                     </div>
                   </div>
 
                   {/* profile 2 column summary */}
-                  <div className="bg-gray-900/20 border border-gray-800 rounded-2xl p-6 space-y-6">
-                    <div className="flex items-center gap-4 border-b border-gray-800/80 pb-4">
-                      <img src={comparisonResult.user2.profile.avatarUrl} alt={comparisonResult.user2.profile.username} className="w-12 h-12 rounded-full border border-gray-700 bg-gray-900 object-cover" />
-                      <div>
-                        <h3 className="font-display font-bold text-lg text-white leading-tight">
-                          {comparisonResult.user2.profile.name || comparisonResult.user2.profile.username}
-                        </h3>
-                        <p className="font-mono text-xs text-brand-blue">@{comparisonResult.user2.profile.username}</p>
+                  <div className="bg-gray-900/40 border border-gray-800 rounded-2xl p-6 space-y-6 flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <div className="flex items-start justify-between gap-4 border-b border-gray-800/80 pb-4">
+                        <div className="flex items-center gap-3.5">
+                          <img src={comparisonResult.user2.profile.avatarUrl} alt={comparisonResult.user2.profile.username} className="w-14 h-14 rounded-2xl border-2 border-brand-blue/50 bg-gray-900 object-cover shadow-md" />
+                          <div>
+                            <h3 className="font-display font-bold text-lg text-white leading-tight">
+                              {comparisonResult.user2.profile.name || comparisonResult.user2.profile.username}
+                            </h3>
+                            <p className="font-mono text-xs text-brand-blue">@{comparisonResult.user2.profile.username}</p>
+                            {comparisonResult.user2.profile.location && (
+                              <p className="text-[11px] text-gray-400 flex items-center gap-1 mt-0.5">
+                                <MapPin className="w-3 h-3 text-gray-500" />
+                                {comparisonResult.user2.profile.location}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <span className={`text-xs font-mono font-bold px-2.5 py-1 rounded-lg border uppercase ${getGradeMeta(comparisonResult.user2.scorecard.grade).bg} ${getGradeMeta(comparisonResult.user2.scorecard.grade).text} ${getGradeMeta(comparisonResult.user2.scorecard.grade).border}`}>
+                          {comparisonResult.user2.scorecard.grade} Grade
+                        </span>
+                      </div>
+
+                      {/* Bio */}
+                      {comparisonResult.user2.profile.bio && (
+                        <p className="text-xs text-gray-300 line-clamp-2 leading-relaxed italic bg-black/30 p-2.5 rounded-lg border border-gray-850">
+                          "{comparisonResult.user2.profile.bio}"
+                        </p>
+                      )}
+
+                      {/* Score Highlight Box */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-black/50 border border-gray-850 p-3.5 rounded-xl text-center">
+                          <p className="text-[10px] font-mono text-gray-500 uppercase">Scorecard Index</p>
+                          <p className="text-3xl font-display font-black text-white mt-1">
+                            {comparisonResult.user2.scorecard.overallScore}
+                            <span className="text-xs font-mono text-gray-500 font-normal">/1000</span>
+                          </p>
+                        </div>
+
+                        <div className="bg-black/50 border border-gray-850 p-3.5 rounded-xl text-center">
+                          <p className="text-[10px] font-mono text-gray-500 uppercase">Skill Level</p>
+                          <p className="text-sm font-display font-bold text-brand-blue mt-2">
+                            {comparisonResult.user2.scorecard.careerInsights?.skillLevel || "Advanced"}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Key Profile Stats */}
+                      <div className="grid grid-cols-3 gap-2 text-center pt-1 font-mono text-xs">
+                        <div className="bg-gray-900/60 p-2 rounded-lg border border-gray-800">
+                          <p className="text-[10px] text-gray-500">Repositories</p>
+                          <p className="font-bold text-white text-sm">{comparisonResult.user2.profile.publicRepos}</p>
+                        </div>
+                        <div className="bg-gray-900/60 p-2 rounded-lg border border-gray-800">
+                          <p className="text-[10px] text-gray-500">Followers</p>
+                          <p className="font-bold text-brand-amber text-sm">{comparisonResult.user2.profile.followers}</p>
+                        </div>
+                        <div className="bg-gray-900/60 p-2 rounded-lg border border-gray-800">
+                          <p className="text-[10px] text-gray-500">Following</p>
+                          <p className="font-bold text-gray-400 text-sm">{comparisonResult.user2.profile.following}</p>
+                        </div>
+                      </div>
+
+                      {/* breakdown metrics summary */}
+                      <div className="space-y-2.5 pt-2 border-t border-gray-800/80">
+                        <div className="flex justify-between text-xs font-mono">
+                          <span className="text-gray-400">Profile Completeness</span>
+                          <span className="text-white font-bold">{comparisonResult.user2.scorecard.metrics.profileCompleteness}/100</span>
+                        </div>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span className="text-gray-400">Repository Quality</span>
+                          <span className="text-white font-bold">{comparisonResult.user2.scorecard.metrics.repositoryQuality}/200</span>
+                        </div>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span className="text-gray-400">Contribution Activity</span>
+                          <span className="text-white font-bold">{comparisonResult.user2.scorecard.metrics.contributionActivity}/250</span>
+                        </div>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span className="text-gray-400">Open Source Engagement</span>
+                          <span className="text-white font-bold">{comparisonResult.user2.scorecard.metrics.openSourceEngagement}/150</span>
+                        </div>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span className="text-gray-400">Code Consistency</span>
+                          <span className="text-white font-bold">{comparisonResult.user2.scorecard.metrics.codeConsistency}/100</span>
+                        </div>
+                        <div className="flex justify-between text-xs font-mono">
+                          <span className="text-gray-400">Community Impact</span>
+                          <span className="text-white font-bold">{comparisonResult.user2.scorecard.metrics.communityImpact}/100</span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-black/40 border border-gray-850 p-4 rounded-xl text-center">
-                        <p className="text-[10px] font-mono text-gray-500 uppercase">Dev Score</p>
-                        <p className="text-3xl font-display font-black text-white mt-1">
-                          {comparisonResult.user2.scorecard.overallScore}
-                        </p>
-                      </div>
-
-                      <div className="bg-black/40 border border-gray-850 p-4 rounded-xl text-center">
-                        <p className="text-[10px] font-mono text-gray-500 uppercase">Grade</p>
-                        <p className={`text-3xl font-mono font-black mt-1 ${getGradeMeta(comparisonResult.user2.scorecard.grade).text}`}>
-                          {comparisonResult.user2.scorecard.grade}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* breakdown metrics summary */}
-                    <div className="space-y-3 pt-2">
-                      <div className="flex justify-between text-xs font-mono">
-                        <span className="text-gray-400">Profile completeness</span>
-                        <span className="text-white font-bold">{comparisonResult.user2.scorecard.metrics.profileCompleteness}/100</span>
-                      </div>
-                      <div className="flex justify-between text-xs font-mono">
-                        <span className="text-gray-400">Total repos</span>
-                        <span className="text-white font-bold">{comparisonResult.user2.profile.publicRepos}</span>
-                      </div>
-                      <div className="flex justify-between text-xs font-mono">
-                        <span className="text-gray-400">Followers metrics</span>
-                        <span className="text-white font-bold">{comparisonResult.user2.profile.followers}</span>
-                      </div>
-                      <div className="flex justify-between text-xs font-mono">
-                        <span className="text-gray-400">Repo quality</span>
-                        <span className="text-white font-bold">{comparisonResult.user2.scorecard.metrics.repositoryQuality}/200</span>
-                      </div>
-                      <div className="flex justify-between text-xs font-mono">
-                        <span className="text-gray-400">Contribution index</span>
-                        <span className="text-white font-bold">{comparisonResult.user2.scorecard.metrics.contributionActivity}/250</span>
-                      </div>
+                    {/* Action buttons */}
+                    <div className="pt-4 border-t border-gray-800 flex flex-wrap gap-2">
+                      <a 
+                        href={`https://github.com/${comparisonResult.user2.profile.username}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 py-2.5 px-3 bg-gray-800 hover:bg-gray-700 text-white text-xs font-bold font-mono rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95 text-center"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5 text-brand-blue" />
+                        Visit Profile
+                      </a>
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          setCurrentReport(comparisonResult.user2);
+                          setCurrentTab("dashboard");
+                        }}
+                        className="py-2.5 px-3 bg-brand-blue/20 hover:bg-brand-blue/30 border border-brand-blue/40 text-brand-blue text-xs font-bold font-mono rounded-xl transition-all flex items-center justify-center gap-1.5 active:scale-95"
+                      >
+                        <Sparkles className="w-3.5 h-3.5" />
+                        View Scorecard
+                      </button>
                     </div>
                   </div>
 
+                </div>
+
+                {/* Head-to-Head Comparative Metric Bars */}
+                <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6 sm:p-8 space-y-6">
+                  <div className="flex items-center justify-between border-b border-gray-800 pb-4">
+                    <div>
+                      <h3 className="font-display font-bold text-lg text-white">Head-to-Head Metric Comparisons</h3>
+                      <p className="text-xs text-gray-400 font-mono">Direct category breakdown comparison</p>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs font-mono">
+                      <span className="flex items-center gap-1.5 text-brand-purple">
+                        <div className="w-3 h-3 rounded-full bg-brand-purple"></div>
+                        {comparisonResult.user1.profile.username}
+                      </span>
+                      <span className="flex items-center gap-1.5 text-brand-blue">
+                        <div className="w-3 h-3 rounded-full bg-brand-blue"></div>
+                        {comparisonResult.user2.profile.username}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-5">
+                    {[
+                      {
+                        label: "Repository Quality",
+                        max: 200,
+                        v1: comparisonResult.user1.scorecard.metrics.repositoryQuality,
+                        v2: comparisonResult.user2.scorecard.metrics.repositoryQuality
+                      },
+                      {
+                        label: "Contribution Activity",
+                        max: 250,
+                        v1: comparisonResult.user1.scorecard.metrics.contributionActivity,
+                        v2: comparisonResult.user2.scorecard.metrics.contributionActivity
+                      },
+                      {
+                        label: "Open Source Engagement",
+                        max: 150,
+                        v1: comparisonResult.user1.scorecard.metrics.openSourceEngagement,
+                        v2: comparisonResult.user2.scorecard.metrics.openSourceEngagement
+                      },
+                      {
+                        label: "Profile Completeness",
+                        max: 100,
+                        v1: comparisonResult.user1.scorecard.metrics.profileCompleteness,
+                        v2: comparisonResult.user2.scorecard.metrics.profileCompleteness
+                      },
+                      {
+                        label: "Followers Reach",
+                        max: 100,
+                        v1: comparisonResult.user1.scorecard.metrics.followers,
+                        v2: comparisonResult.user2.scorecard.metrics.followers
+                      },
+                      {
+                        label: "Code Consistency",
+                        max: 100,
+                        v1: comparisonResult.user1.scorecard.metrics.codeConsistency,
+                        v2: comparisonResult.user2.scorecard.metrics.codeConsistency
+                      },
+                      {
+                        label: "Community Impact",
+                        max: 100,
+                        v1: comparisonResult.user1.scorecard.metrics.communityImpact,
+                        v2: comparisonResult.user2.scorecard.metrics.communityImpact
+                      }
+                    ].map((row) => (
+                      <div key={row.label} className="space-y-2">
+                        <div className="flex justify-between text-xs font-mono">
+                          <span className="text-gray-300 font-bold">{row.label}</span>
+                          <div className="flex items-center gap-3">
+                            <span className={`font-bold ${row.v1 >= row.v2 ? 'text-brand-purple' : 'text-gray-400'}`}>
+                              {row.v1}/{row.max}
+                            </span>
+                            <span className="text-gray-600">vs</span>
+                            <span className={`font-bold ${row.v2 >= row.v1 ? 'text-brand-blue' : 'text-gray-400'}`}>
+                              {row.v2}/{row.max}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Dual bar display */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="h-2.5 bg-gray-950 rounded-full overflow-hidden border border-gray-800 flex justify-end">
+                            <div 
+                              className="h-full bg-brand-purple transition-all duration-500 rounded-full"
+                              style={{ width: `${Math.min(100, (row.v1 / row.max) * 100)}%` }}
+                            ></div>
+                          </div>
+                          <div className="h-2.5 bg-gray-950 rounded-full overflow-hidden border border-gray-800">
+                            <div 
+                              className="h-full bg-brand-blue transition-all duration-500 rounded-full"
+                              style={{ width: `${Math.min(100, (row.v2 / row.max) * 100)}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Top Repositories Peek Side-by-Side */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* User 1 Repos */}
+                  <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6 space-y-4">
+                    <h4 className="text-sm font-bold text-white font-display flex items-center gap-2">
+                      <Folder className="w-4 h-4 text-brand-purple" />
+                      Top Repositories — @{comparisonResult.user1.profile.username}
+                    </h4>
+                    <div className="space-y-3">
+                      {(comparisonResult.user1.repositories || []).slice(0, 3).map((repo, idx) => (
+                        <div key={idx} className="bg-black/40 border border-gray-850 p-3.5 rounded-xl space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-xs text-white font-mono">{repo.name}</span>
+                            <span className="text-[10px] font-mono text-brand-amber bg-brand-amber/10 px-2 py-0.5 rounded border border-brand-amber/20">
+                              QS: {repo.qualityScore}/100
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-gray-400 line-clamp-1">{repo.description || "Public repository"}</p>
+                          <div className="flex items-center gap-3 text-[10px] font-mono text-gray-500">
+                            {repo.language && <span className="text-brand-purple">● {repo.language}</span>}
+                            <span>★ {repo.stars || 0} stars</span>
+                            <span>🍴 {repo.forks || 0} forks</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* User 2 Repos */}
+                  <div className="bg-gray-900/30 border border-gray-800 rounded-2xl p-6 space-y-4">
+                    <h4 className="text-sm font-bold text-white font-display flex items-center gap-2">
+                      <Folder className="w-4 h-4 text-brand-blue" />
+                      Top Repositories — @{comparisonResult.user2.profile.username}
+                    </h4>
+                    <div className="space-y-3">
+                      {(comparisonResult.user2.repositories || []).slice(0, 3).map((repo, idx) => (
+                        <div key={idx} className="bg-black/40 border border-gray-850 p-3.5 rounded-xl space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-xs text-white font-mono">{repo.name}</span>
+                            <span className="text-[10px] font-mono text-brand-amber bg-brand-amber/10 px-2 py-0.5 rounded border border-brand-amber/20">
+                              QS: {repo.qualityScore}/100
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-gray-400 line-clamp-1">{repo.description || "Public repository"}</p>
+                          <div className="flex items-center gap-3 text-[10px] font-mono text-gray-500">
+                            {repo.language && <span className="text-brand-blue">● {repo.language}</span>}
+                            <span>★ {repo.stars || 0} stars</span>
+                            <span>🍴 {repo.forks || 0} forks</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
               </div>
