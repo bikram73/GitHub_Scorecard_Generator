@@ -151,6 +151,143 @@ function getGeminiClient(): GoogleGenAI {
   return aiClient;
 }
 
+export function calculateProfileScorecard(gitUser: any, gitRepos: any[] = []) {
+  const publicRepos = Number(gitUser?.public_repos ?? (gitRepos?.length || 0));
+  const followers = Number(gitUser?.followers ?? 0);
+  const following = Number(gitUser?.following ?? 0);
+  const bio = (gitUser?.bio || "").trim();
+  const location = (gitUser?.location || "").trim();
+  const blog = (gitUser?.blog || "").trim();
+  const twitter = (gitUser?.twitter_username || "").trim();
+  const avatar = gitUser?.avatar_url || "";
+  const createdAt = gitUser?.created_at ? new Date(gitUser.created_at) : new Date(Date.now() - 365 * 24 * 3600 * 1000);
+  
+  // Calculate Account Age in Years
+  const accountAgeYears = Math.max(0.1, (Date.now() - createdAt.getTime()) / (365.25 * 24 * 3600 * 1000));
+
+  // Sum real repo metrics
+  let totalStars = 0;
+  let totalForks = 0;
+  let reposWithLicense = 0;
+  let reposWithDescription = 0;
+  const languagesSet = new Set<string>();
+  let recentUpdatedRepos = 0;
+  const thirtyDaysAgo = Date.now() - 30 * 24 * 3600 * 1000;
+  const ninetyDaysAgo = Date.now() - 90 * 24 * 3600 * 1000;
+
+  (gitRepos || []).forEach(r => {
+    totalStars += Number(r.stargazers_count || 0);
+    totalForks += Number(r.forks_count || 0);
+    if (r.license) reposWithLicense++;
+    if (r.description && r.description.trim().length > 5) reposWithDescription++;
+    if (r.language) languagesSet.add(r.language);
+    if (r.updated_at && new Date(r.updated_at).getTime() > thirtyDaysAgo) recentUpdatedRepos++;
+    else if (r.updated_at && new Date(r.updated_at).getTime() > ninetyDaysAgo) recentUpdatedRepos += 0.5;
+  });
+
+  // 1. Profile Completeness (0-100)
+  let profileCompleteness = 0;
+  if (avatar && !avatar.includes("dicebear")) profileCompleteness += 15;
+  else profileCompleteness += 10;
+  if (bio.length > 25) profileCompleteness += 25;
+  else if (bio.length > 0) profileCompleteness += 15;
+  if (location) profileCompleteness += 15;
+  if (blog) profileCompleteness += 15;
+  if (twitter) profileCompleteness += 15;
+  if (publicRepos > 0) profileCompleteness += 15;
+  profileCompleteness = Math.min(100, Math.max(15, profileCompleteness));
+
+  // 2. Followers (0-100) - Logarithmic realistic scaling
+  let followersScore = 15;
+  if (followers === 0) followersScore = 15;
+  else if (followers < 5) followersScore = 30 + followers * 3;
+  else if (followers < 20) followersScore = 45 + (followers - 5) * 1.5;
+  else if (followers < 50) followersScore = 65 + (followers - 20) * 0.4;
+  else if (followers < 200) followersScore = 77 + (followers - 50) * 0.08;
+  else if (followers < 1000) followersScore = 88 + (followers - 200) * 0.01;
+  else followersScore = 100;
+  followersScore = Math.min(100, Math.max(10, Math.round(followersScore)));
+
+  // 3. Repository Quality (0-200)
+  let repoQuality = 35;
+  if (totalStars > 1000) repoQuality += 90;
+  else if (totalStars > 100) repoQuality += 70 + Math.min(20, (totalStars - 100) * 0.02);
+  else if (totalStars > 20) repoQuality += 45 + (totalStars - 20) * 1.2;
+  else if (totalStars > 0) repoQuality += 20 + totalStars * 1.2;
+
+  const repoCount = Math.max(1, gitRepos.length);
+  const descRatio = reposWithDescription / repoCount;
+  const licenseRatio = reposWithLicense / repoCount;
+  repoQuality += Math.round(descRatio * 35);
+  repoQuality += Math.round(licenseRatio * 25);
+  repoQuality += Math.min(20, languagesSet.size * 5);
+  repoQuality = Math.min(200, Math.max(25, Math.round(repoQuality)));
+
+  // 4. Contribution Activity (0-250)
+  let contribScore = 35;
+  if (publicRepos >= 50) contribScore += 110;
+  else if (publicRepos >= 20) contribScore += 80 + (publicRepos - 20);
+  else if (publicRepos >= 5) contribScore += 45 + (publicRepos - 5) * 2.3;
+  else contribScore += publicRepos * 9;
+
+  contribScore += Math.min(50, Math.round(recentUpdatedRepos * 15));
+  contribScore += Math.min(50, Math.round(accountAgeYears * 8));
+  contribScore = Math.min(250, Math.max(35, Math.round(contribScore)));
+
+  // 5. Open Source Engagement (0-150)
+  let openSource = 25;
+  if (totalForks > 50) openSource += 50;
+  else if (totalForks > 0) openSource += Math.min(45, totalForks * 6);
+  if (reposWithLicense > 0) openSource += Math.min(35, reposWithLicense * 10);
+  if (following > 10) openSource += 25;
+  else if (following > 0) openSource += following * 2;
+  if (publicRepos > 3) openSource += 15;
+  openSource = Math.min(150, Math.max(20, Math.round(openSource)));
+
+  // 6. Code Consistency (0-100)
+  let consistency = 45;
+  if (accountAgeYears >= 3) consistency += 25;
+  else if (accountAgeYears >= 1) consistency += 15;
+  if (recentUpdatedRepos >= 2) consistency += 20;
+  else if (recentUpdatedRepos >= 1) consistency += 10;
+  if (publicRepos >= 10) consistency += 10;
+  consistency = Math.min(100, Math.max(30, Math.round(consistency)));
+
+  // 7. Community Impact (0-100)
+  let community = 20;
+  const reach = followers + totalStars + totalForks;
+  if (reach > 500) community = 95;
+  else if (reach > 100) community = 75 + Math.round((reach - 100) * 0.05);
+  else if (reach > 20) community = 50 + Math.round((reach - 20) * 0.3);
+  else community = 20 + Math.round(reach * 1.5);
+  community = Math.min(100, Math.max(15, Math.round(community)));
+
+  const overallScore = Math.min(1000, Math.max(120, profileCompleteness + followersScore + repoQuality + contribScore + openSource + consistency + community));
+  const grade = calculateGrade(overallScore);
+  const percentile = calculatePercentile(overallScore);
+
+  return {
+    overallScore,
+    grade,
+    percentile,
+    metrics: {
+      profileCompleteness,
+      followers: followersScore,
+      repositoryQuality: repoQuality,
+      contributionActivity: contribScore,
+      openSourceEngagement: openSource,
+      codeConsistency: consistency,
+      communityImpact: community
+    },
+    stats: {
+      totalStars,
+      totalForks,
+      accountAgeYears: Number(accountAgeYears.toFixed(1)),
+      recentUpdatedRepos
+    }
+  };
+}
+
 function calculateGrade(score: number): string {
   if (score >= 950) return "S+";
   if (score >= 900) return "S";
@@ -362,6 +499,8 @@ export async function generateScorecardReport(username: string): Promise<any> {
     isMock = true;
   }
 
+  const deterministicBase = calculateProfileScorecard(gitUser, gitRepos);
+
   const ai = getGeminiClient();
   const hasApiKey = process.env.GEMINI_API_KEY ? true : false;
 
@@ -369,18 +508,8 @@ export async function generateScorecardReport(username: string): Promise<any> {
   if (isMock) {
     prompt = `
       You are a senior technical evaluation agent. Create an authentic public GitHub profile scorecard report for user: "${cleanUsername}". 
-      If you have knowledge of their real public work or repositories, use that to build as authentic a profile as possible!
-      Otherwise, synthesize a highly suitable developer scorecard matching their username styling.
-
+      Calculated Base Baseline: ${JSON.stringify(deterministicBase.metrics)} (Total Score ~ ${deterministicBase.overallScore}/1000, Grade: ${deterministicBase.grade}).
       Generate the evaluation structure strictly adhering to the JSON schema. Ensure total metrics sum up to 0-1000 points.
-      Score category bounds:
-      - profileCompleteness (0-100)
-      - followers (0-100)
-      - repositoryQuality (0-200)
-      - contributionActivity (0-250)
-      - openSourceEngagement (0-150)
-      - codeConsistency (0-100)
-      - communityImpact (0-100)
     `;
   } else {
     const strippedRepos = gitRepos.slice(0, 4).map(r => ({
@@ -416,15 +545,11 @@ export async function generateScorecardReport(username: string): Promise<any> {
       
       Analyzed Repositories:
       ${JSON.stringify(strippedRepos, null, 2)}
+
+      Deterministic Evaluated Baseline:
+      ${JSON.stringify(deterministicBase, null, 2)}
       
-      Calculate exact metrics matching schema:
-      - profileCompleteness (0-100)
-      - followers (0-100)
-      - repositoryQuality (0-200)
-      - contributionActivity (0-250)
-      - openSourceEngagement (0-150)
-      - codeConsistency (0-100)
-      - communityImpact (0-100)
+      Output evaluation metrics closely aligned with the deterministic baseline metrics for authentic consistency.
     `;
   }
 
@@ -472,90 +597,103 @@ export async function generateScorecardReport(username: string): Promise<any> {
   }
 
   if (!finalReport) {
-    const isKnown = cleanUsername.toLowerCase() === "torvalds" || cleanUsername.toLowerCase() === "gaearon" || cleanUsername.toLowerCase() === "yyx990803";
-    const calculatedScore = isKnown ? 920 : Math.floor(Math.random() * 250) + 650;
-    const finalGrade = calculateGrade(calculatedScore);
+    const calculatedScore = deterministicBase.overallScore;
+    const finalGrade = deterministicBase.grade;
 
     finalReport = {
       profile: {
         username: cleanUsername,
         name: gitUser?.name || cleanUsername,
         avatarUrl: gitUser?.avatar_url || `https://api.dicebear.com/7.x/pixel-art/svg?seed=${cleanUsername}`,
-        bio: gitUser?.bio || "An active software craftsman build-testing new utilities end to end.",
+        bio: gitUser?.bio || (gitRepos.length > 0 ? `Active developer with ${gitUser?.public_repos || gitRepos.length} public repositories.` : "Developer with public GitHub portfolio."),
         location: gitUser?.location || "Global Developer",
         website: gitUser?.blog || "https://github.com/" + cleanUsername,
         twitterUsername: gitUser?.twitter_username || "",
-        publicRepos: gitUser?.public_repos || 24,
-        followers: gitUser?.followers || 82,
-        following: gitUser?.following || 120,
+        publicRepos: gitUser?.public_repos || gitRepos.length,
+        followers: gitUser?.followers || 0,
+        following: gitUser?.following || 0,
         createdAt: gitUser?.created_at || "2021-04-12T10:00:00Z",
-        hasReadmeProfile: true,
-        socialLinksCount: 2
+        hasReadmeProfile: Boolean(gitUser?.bio || gitUser?.blog),
+        socialLinksCount: (gitUser?.blog ? 1 : 0) + (gitUser?.twitter_username ? 1 : 0)
       },
       scorecard: {
         overallScore: calculatedScore,
         grade: finalGrade,
-        percentile: calculatePercentile(calculatedScore),
-        streak: 14,
-        yearlyCommitsCount: 420,
-        weeklyCommits: [14, 25, 42, 19, 12, 3, 5],
-        weeklyPrs: [1, 2, 4, 1, 0, 0, 1],
-        metrics: {
-          profileCompleteness: 85,
-          followers: Math.min(100, Math.floor((gitUser?.followers || 82) * 1.5)),
-          repositoryQuality: Math.floor((calculatedScore / 1000) * 200),
-          contributionActivity: Math.floor((calculatedScore / 1000) * 250),
-          openSourceEngagement: Math.floor((calculatedScore / 1000) * 150),
-          codeConsistency: 80,
-          communityImpact: 75
-        },
+        percentile: deterministicBase.percentile,
+        streak: Math.min(30, Math.max(3, Math.round(deterministicBase.metrics.codeConsistency / 3.5))),
+        yearlyCommitsCount: Math.round(deterministicBase.metrics.contributionActivity * 2.8),
+        weeklyCommits: [
+          Math.round(deterministicBase.metrics.contributionActivity * 0.08),
+          Math.round(deterministicBase.metrics.contributionActivity * 0.12),
+          Math.round(deterministicBase.metrics.contributionActivity * 0.18),
+          Math.round(deterministicBase.metrics.contributionActivity * 0.14),
+          Math.round(deterministicBase.metrics.contributionActivity * 0.1),
+          Math.round(deterministicBase.metrics.contributionActivity * 0.03),
+          Math.round(deterministicBase.metrics.contributionActivity * 0.04)
+        ],
+        weeklyPrs: [1, 2, 3, 1, 0, 0, 1],
+        metrics: deterministicBase.metrics,
         radarData: [
-          { subject: "Coding", value: 85 },
-          { subject: "Consistency", value: 80 },
-          { subject: "Documentation", value: 90 },
-          { subject: "Community", value: 75 },
-          { subject: "Impact", value: 70 },
-          { subject: "Repository Insights", value: 88 }
+          { subject: "Coding", value: Math.min(100, Math.round(deterministicBase.metrics.repositoryQuality / 2)) },
+          { subject: "Consistency", value: deterministicBase.metrics.codeConsistency },
+          { subject: "Documentation", value: deterministicBase.metrics.profileCompleteness },
+          { subject: "Community", value: deterministicBase.metrics.communityImpact },
+          { subject: "Impact", value: Math.min(100, Math.round(deterministicBase.metrics.openSourceEngagement / 1.5)) },
+          { subject: "Repositories", value: Math.min(100, Math.round(deterministicBase.metrics.contributionActivity / 2.5)) }
         ],
         improvements: [
-          "Enable strict TypeScript configurations to minimize runtime type errors.",
-          "Write descriptive pull request summaries to aid code maintainability.",
-          "Complete bio and personal portfolio references in the main Readme profile.",
-          "Increase testing coverage up to 80% with automated frameworks."
+          deterministicBase.metrics.profileCompleteness < 80 ? "Add comprehensive bio, avatar, and social links to improve profile completeness." : "Maintain high profile completeness.",
+          deterministicBase.metrics.repositoryQuality < 140 ? "Add clear README documentation, licenses, and unit tests to public repositories." : "Keep repository architecture diagrams up to date.",
+          deterministicBase.metrics.openSourceEngagement < 100 ? "Publish open source libraries or contribute pull requests to upstream community projects." : "Maintain active open source engagement."
         ],
         careerInsights: {
-          suitableRoles: ["Full Stack Developer", "Backend Engineer", "Cloud & DevOps Integrator"],
-          skillLevel: calculatedScore >= 850 ? "Advanced" : "Intermediate",
-          summary: `${cleanUsername} demonstrates strong commitment to clean codebase semantics, consistent contributions, and solid developer hygiene.`
+          suitableRoles: calculatedScore >= 850 
+            ? ["Senior Full Stack Engineer", "Open Source Lead", "Lead Architect"]
+            : calculatedScore >= 700 
+            ? ["Full Stack Developer", "Backend Engineer", "Software Engineer"]
+            : ["Junior Software Developer", "Frontend Contributor", "Open Source Apprentice"],
+          skillLevel: calculatedScore >= 880 ? "Expert" : calculatedScore >= 780 ? "Advanced" : calculatedScore >= 600 ? "Intermediate" : "Beginner",
+          summary: `${cleanUsername} has a quantified developer index of ${calculatedScore}/1000 (${finalGrade}), backed by ${deterministicBase.stats.totalStars} total stars, ${gitUser?.public_repos || gitRepos.length} repositories, and ${deterministicBase.stats.accountAgeYears} years of activity on GitHub.`
         },
         analyzedAt: new Date().toISOString()
       },
-      repositories: (gitRepos && gitRepos.length > 0 ? gitRepos.slice(0, 4) : [
-        { name: "core-utility-app", description: "Modern web tools and optimized architecture." },
-        { name: "analytics-dashboard", description: "Interactive responsive dashboard UI." }
-      ]).map((r, i) => ({
-        name: r.name,
-        description: r.description || "Project repository",
-        stars: r.stargazers_count || (5 - i > 0 ? 5 - i : 0),
-        forks: r.forks_count || (2 - i > 0 ? 2 - i : 0),
-        language: r.language || (i === 0 ? "TypeScript" : "JavaScript"),
-        watchers: r.watchers_count || 1,
-        qualityScore: Math.floor(Math.random() * 20) + 78,
-        status: i === 0 ? "Optimized" : "Active",
-        license: r.license?.name || "MIT",
-        hasReadme: true,
-        hasLicense: true,
-        topics: r.topics || ["typescript", "react"],
-        cognitiveComplexity: "Low",
-        refactorsCount: 3,
-        bugsCount: 0,
-        techDebtHours: 4,
-        aiFeedback: {
-          qualityRating: "Excellent",
-          strengths: ["Clean documentation", "Active commits"],
-          improvements: ["Expand automated test coverage", "Add CI/CD pipelines"]
-        }
-      }))
+      repositories: (gitRepos && gitRepos.length > 0 ? gitRepos.slice(0, 6) : [
+        { name: `${cleanUsername}-project`, description: "Public repository." }
+      ]).map((r: any, i: number) => {
+        const repoStars = Number(r.stargazers_count || 0);
+        const repoForks = Number(r.forks_count || 0);
+        let repoQS = 60;
+        if (repoStars > 50) repoQS += 25;
+        else if (repoStars > 5) repoQS += 15;
+        else if (repoStars > 0) repoQS += 8;
+        if (r.description && r.description.length > 10) repoQS += 8;
+        if (r.license) repoQS += 7;
+        repoQS = Math.min(98, repoQS);
+
+        return {
+          name: r.name || `project-${i + 1}`,
+          description: r.description || "Public repository project",
+          stars: repoStars,
+          forks: repoForks,
+          language: r.language || (i === 0 ? "TypeScript" : "JavaScript"),
+          watchers: r.watchers_count || repoStars || 1,
+          qualityScore: repoQS,
+          status: repoQS >= 85 ? "Optimized" : "Active",
+          license: r.license?.name || "MIT",
+          hasReadme: true,
+          hasLicense: Boolean(r.license),
+          topics: r.topics || ["developer-tools"],
+          cognitiveComplexity: repoQS > 80 ? "Low" : "Medium",
+          refactorsCount: Math.max(0, Math.floor((100 - repoQS) / 10)),
+          bugsCount: 0,
+          techDebtHours: Math.max(1, Math.floor((100 - repoQS) / 8)),
+          aiFeedback: {
+            qualityRating: repoQS >= 85 ? "Excellent" : "Good",
+            strengths: [r.language ? `Primary language: ${r.language}` : "Clean codebase", `${repoStars} stargazers`],
+            improvements: ["Add CI/CD pipeline", "Increase automated test coverage"]
+          }
+        };
+      })
     };
   }
 
