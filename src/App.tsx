@@ -861,7 +861,7 @@ export default function App() {
                       type="text"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      placeholder="e.g. torvalds, yyx990803, or github.com/username"
+                      placeholder="e.g. bikram73, torvalds, or github.com/username"
                       autoFocus
                       className="w-full bg-black/60 border border-gray-700 rounded-xl py-4 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple transition-all text-sm font-mono shadow-inner"
                     />
@@ -1594,7 +1594,7 @@ export default function App() {
                     type="text" 
                     value={user1}
                     onChange={(e) => setUser1(e.target.value)}
-                    placeholder="e.g. BikramManna"
+                    placeholder="e.g. bikram73"
                     className="w-full bg-black/50 border border-gray-700 rounded-xl py-3 px-4 text-sm text-white placeholder-gray-600 font-mono focus:outline-none focus:border-brand-purple"
                   />
                 </div>
