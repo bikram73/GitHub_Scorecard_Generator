@@ -174,18 +174,29 @@ function calculatePercentile(score: number): number {
   return 85.0;
 }
 
+async function fetchWithTimeout(url: string, options: any = {}, timeoutMs = 4000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    return response;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 async function fetchGithubData(username: string) {
   const headers: Record<string, string> = {
     "User-Agent": "GitHub-Scorecard-Generator-App",
     "Accept": "application/vnd.github.v3+json"
   };
 
-  if (process.env.GITHUB_TOKEN) {
-    headers["Authorization"] = `Bearer ${process.env.GITHUB_TOKEN}`;
+  if (process.env.GITHUB_TOKEN && process.env.GITHUB_TOKEN.trim()) {
+    headers["Authorization"] = `Bearer ${process.env.GITHUB_TOKEN.trim()}`;
   }
 
   try {
-    const userRes = await fetch(`https://api.github.com/users/${username}`, { headers });
+    const userRes = await fetchWithTimeout(`https://api.github.com/users/${username}`, { headers }, 4000);
     if (userRes.status === 404) {
       throw new Error("USER_NOT_FOUND");
     }
@@ -194,15 +205,19 @@ async function fetchGithubData(username: string) {
     }
     const user = await userRes.json();
 
-    const reposRes = await fetch(`https://api.github.com/users/${username}/repos?per_page=40&sort=updated`, { headers });
     let repos: any[] = [];
-    if (reposRes.ok) {
-      repos = await reposRes.json();
+    try {
+      const reposRes = await fetchWithTimeout(`https://api.github.com/users/${username}/repos?per_page=40&sort=updated`, { headers }, 4000);
+      if (reposRes.ok) {
+        repos = await reposRes.json();
+      }
+    } catch {
+      // Repos fetch optional
     }
 
     return { user, repos };
   } catch (err: any) {
-    console.error("Error in fetchGithubData:", err.message);
+    console.warn(`GitHub API lookup warning for ${username}:`, err.message);
     throw err;
   }
 }
@@ -417,7 +432,7 @@ export async function generateScorecardReport(username: string): Promise<any> {
 
   if (hasApiKey) {
     try {
-      const response = await ai.models.generateContent({
+      const geminiCall = ai.models.generateContent({
         model: "gemini-2.5-flash",
         contents: prompt,
         config: {
@@ -427,7 +442,13 @@ export async function generateScorecardReport(username: string): Promise<any> {
         }
       });
 
-      const responseText = response.text || "{}";
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("GEMINI_TIMEOUT")), 5000)
+      );
+
+      const response: any = await Promise.race([geminiCall, timeoutPromise]);
+
+      const responseText = response?.text || "{}";
       finalReport = JSON.parse(responseText.trim());
 
       const totalScore = Object.values(finalReport.scorecard.metrics).reduce((a: any, b: any) => a + b, 0) as number;
@@ -446,7 +467,7 @@ export async function generateScorecardReport(username: string): Promise<any> {
         finalReport.profile.twitterUsername = gitUser.twitter_username || "";
       }
     } catch (genErr) {
-      console.warn("Gemini generation fallback:", genErr);
+      console.warn("Gemini generation fallback triggered:", genErr);
     }
   }
 
