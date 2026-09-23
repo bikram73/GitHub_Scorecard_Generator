@@ -14,6 +14,7 @@ import {
   Twitter, 
   Calendar, 
   CheckCircle, 
+  CheckCircle2, 
   AlertTriangle, 
   Activity, 
   RefreshCw, 
@@ -241,7 +242,13 @@ export default function App() {
               onClick={() => setCurrentTab("landing")}
               className={`px-3.5 py-1.5 rounded-md transition-colors ${currentTab === 'landing' ? 'bg-gray-800 text-white border border-gray-700' : 'text-gray-400 hover:text-white'}`}
             >
-              Analyze Profile
+              Home
+            </button>
+            <button 
+              onClick={() => setCurrentTab("score")}
+              className={`px-3.5 py-1.5 rounded-md transition-colors ${currentTab === 'score' ? 'bg-gray-800 text-white border border-gray-700' : 'text-gray-400 hover:text-white'}`}
+            >
+              Get Your Score
             </button>
             <button 
               onClick={() => setCurrentTab("compare")}
@@ -265,14 +272,11 @@ export default function App() {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => {
-                setUsername("torvalds");
-                handleAnalyze("torvalds");
-              }}
-              className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 bg-brand-purple text-white rounded-lg hover:bg-brand-purple/90 active:scale-95 transition-all shadow-md shadow-brand-purple/20"
+              onClick={() => setCurrentTab("score")}
+              className="inline-flex items-center gap-1.5 text-xs font-bold font-mono uppercase tracking-wider px-3.5 py-2 bg-gradient-to-r from-brand-purple to-brand-blue text-white rounded-lg hover:opacity-90 active:scale-95 transition-all shadow-md shadow-brand-purple/20"
             >
-              <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-              Linus Torvalds Scorecard
+              <Sparkles className="w-3.5 h-3.5" />
+              Get Your Score
             </button>
           </div>
         </div>
@@ -345,35 +349,30 @@ export default function App() {
               </h1>
 
               <p className="text-lg text-gray-400 max-w-2xl mx-auto font-sans leading-relaxed">
-                Connect your developer journey. Fetch any public GitHub handle and receive an 
-                AI-quantified developer scorecard, deep code analysis, repository breakdown, and role matching suggestions.
+                Connect your developer journey. Enter any public GitHub handle and receive an 
+                AI-quantified developer scorecard (0-1000), deep code analysis, repository breakdown, and role matching suggestions.
               </p>
 
               {/* Quick direct landing CTAs */}
               <div id="hero-actions" className="flex flex-wrap items-center justify-center gap-3 pt-2">
-                <a 
-                  href="#verify-input" 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById("verify-input")?.scrollIntoView({ behavior: "smooth" });
-                    const inp = document.getElementById("username-input") as HTMLInputElement;
-                    if (inp) inp.focus();
-                  }}
-                  className="px-5 py-2.5 bg-gradient-to-r from-brand-purple to-brand-blue hover:from-brand-purple/95 hover:to-brand-blue/95 text-white text-xs font-bold font-mono tracking-wide uppercase rounded-xl transition-all shadow-md shadow-brand-purple/20 flex items-center gap-1.5"
+                <button 
+                  onClick={() => setCurrentTab("score")}
+                  className="px-6 py-3 bg-gradient-to-r from-brand-purple to-brand-blue hover:from-brand-purple/95 hover:to-brand-blue/95 text-white text-xs font-bold font-mono tracking-wide uppercase rounded-xl transition-all shadow-lg shadow-brand-purple/25 flex items-center gap-2 active:scale-95"
                 >
-                  <Search className="w-3.5 h-3.5" />
+                  <Sparkles className="w-4 h-4" />
                   Get Your Score
-                </a>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
                 <button 
                   onClick={() => setCurrentTab("compare")}
-                  className="px-5 py-2.5 bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold font-mono tracking-wide uppercase rounded-xl transition-all flex items-center gap-1.5"
+                  className="px-5 py-3 bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold font-mono tracking-wide uppercase rounded-xl transition-all flex items-center gap-1.5 active:scale-95"
                 >
                   <Users className="w-3.5 h-3.5 text-brand-blue" />
                   Compare Profiles
                 </button>
                 <button 
                   onClick={() => setCurrentTab("leaderboard")}
-                  className="px-5 py-2.5 bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold font-mono tracking-wide uppercase rounded-xl transition-all flex items-center gap-1.5"
+                  className="px-5 py-3 bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 text-xs font-bold font-mono tracking-wide uppercase rounded-xl transition-all flex items-center gap-1.5 active:scale-95"
                 >
                   <Award className="w-3.5 h-3.5 text-brand-amber" />
                   View Rankings
@@ -381,68 +380,64 @@ export default function App() {
               </div>
             </div>
 
-            {/* Analysis Entry Box */}
-            <div id="verify-input" className="scroll-mt-24 max-w-xl mx-auto">
-              <div className="bg-gray-900/40 p-6 sm:p-8 rounded-2xl border border-gray-800 shadow-2xl space-y-5 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-purple/5 rounded-full blur-3xl"></div>
-                
-                <h3 className="text-sm font-semibold text-white uppercase tracking-wider text-center">
-                  Verify Dev Scorecard
-                </h3>
-
-                <form 
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    if (username.trim()) handleAnalyze(username);
-                  }}
-                  className="space-y-4"
-                >
-                  <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
-                    <input 
-                      id="username-input"
-                      type="text"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      placeholder="Enter username (e.g. torvalds or JohnDev)"
-                      className="w-full bg-black/50 border border-gray-700 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple transition-all text-sm font-mono"
-                    />
-                  </div>
-
-                  {analysisError && (
-                    <div className="p-3 bg-red-950/40 border border-red-900/60 rounded-xl flex gap-2.5 items-start text-xs text-red-300">
-                      <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                      <div>
-                        {analysisError.includes("USER_NOT_FOUND") 
-                          ? "This GitHub handle could not be found. Please check your spelling."
-                          : analysisError}
-                      </div>
-                    </div>
-                  )}
-
-                  <button 
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-brand-purple to-brand-blue text-white py-3.5 px-6 rounded-xl font-bold hover:opacity-95 active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-sm shadow-lg shadow-brand-purple/20"
-                  >
-                    Get AI Scorecard
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </form>
-
-                <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs text-gray-500 font-mono">
-                  <span>Try:</span>
-                  <button onClick={() => triggerUserFromLeaderboard("torvalds")} className="hover:text-brand-purple hover:underline text-gray-400">torvalds</button>
-                  <span>•</span>
-                  <button onClick={() => triggerUserFromLeaderboard("yyx990803")} className="hover:text-brand-purple hover:underline text-gray-400">yyx990803</button>
-                  <span>•</span>
-                  <button onClick={() => triggerUserFromLeaderboard("gvanrossum")} className="hover:text-brand-purple hover:underline text-gray-400">gvanrossum</button>
-                  <span>•</span>
-                  <button onClick={() => triggerUserFromLeaderboard("BikramManna")} className="hover:text-brand-purple hover:underline text-gray-400">BikramManna</button>
+            {/* Feature Highlights Grid */}
+            <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div 
+                onClick={() => setCurrentTab("score")} 
+                className="bg-gray-900/40 border border-gray-800 hover:border-brand-purple/50 p-6 rounded-2xl transition-all cursor-pointer group relative overflow-hidden"
+              >
+                <div className="w-10 h-10 rounded-xl bg-brand-purple/10 border border-brand-purple/30 flex items-center justify-center text-brand-purple mb-4 group-hover:scale-110 transition-transform">
+                  <Activity className="w-5 h-5" />
                 </div>
+                <h3 className="font-display font-bold text-white text-base mb-2 group-hover:text-brand-purple transition-colors">
+                  0-1000 Developer Score
+                </h3>
+                <p className="text-xs text-gray-400 leading-relaxed mb-4">
+                  Quantify profile completeness, star reach, commit frequency, pull request activity, and open-source impact.
+                </p>
+                <span className="text-xs font-mono font-bold text-brand-purple flex items-center gap-1">
+                  Start Analysis <ChevronRight className="w-3.5 h-3.5" />
+                </span>
+              </div>
+
+              <div 
+                onClick={() => setCurrentTab("compare")} 
+                className="bg-gray-900/40 border border-gray-800 hover:border-brand-blue/50 p-6 rounded-2xl transition-all cursor-pointer group relative overflow-hidden"
+              >
+                <div className="w-10 h-10 rounded-xl bg-brand-blue/10 border border-brand-blue/30 flex items-center justify-center text-brand-blue mb-4 group-hover:scale-110 transition-transform">
+                  <Users className="w-5 h-5" />
+                </div>
+                <h3 className="font-display font-bold text-white text-base mb-2 group-hover:text-brand-blue transition-colors">
+                  Side-by-Side Comparison
+                </h3>
+                <p className="text-xs text-gray-400 leading-relaxed mb-4">
+                  Benchmark two GitHub profiles head-to-head. Compare metrics, stars, contributions, and determine the winner.
+                </p>
+                <span className="text-xs font-mono font-bold text-brand-blue flex items-center gap-1">
+                  Compare Developers <ChevronRight className="w-3.5 h-3.5" />
+                </span>
+              </div>
+
+              <div 
+                onClick={() => setCurrentTab("leaderboard")} 
+                className="bg-gray-900/40 border border-gray-800 hover:border-brand-amber/50 p-6 rounded-2xl transition-all cursor-pointer group relative overflow-hidden"
+              >
+                <div className="w-10 h-10 rounded-xl bg-brand-amber/10 border border-brand-amber/30 flex items-center justify-center text-brand-amber mb-4 group-hover:scale-110 transition-transform">
+                  <Award className="w-5 h-5" />
+                </div>
+                <h3 className="font-display font-bold text-white text-base mb-2 group-hover:text-brand-amber transition-colors">
+                  Global & College Rankings
+                </h3>
+                <p className="text-xs text-gray-400 leading-relaxed mb-4">
+                  Explore leaderboard rankings across global developers, colleges, and countries with real-time percentile distribution.
+                </p>
+                <span className="text-xs font-mono font-bold text-brand-amber flex items-center gap-1">
+                  View Leaderboard <ChevronRight className="w-3.5 h-3.5" />
+                </span>
               </div>
             </div>
 
-            {/* Quick Metrics Categories Description for placemets */}
+            {/* Quick Metrics Categories Description */}
             <div className="max-w-5xl mx-auto space-y-6 pt-4">
               <h3 className="text-sm font-mono text-center uppercase tracking-widest text-[#8A8A8A]">
                 Score weight boundaries (1000 pts)
@@ -455,19 +450,19 @@ export default function App() {
                 </div>
                 <div className="bg-gray-900/35 border border-gray-800 p-4 rounded-xl text-center">
                   <span className="block text-xl font-display font-black text-white">100</span>
-                  <span className="block text-xs font-mono text-gray-500 mt-1">Social followers</span>
+                  <span className="block text-xs font-mono text-gray-500 mt-1">Social reach</span>
                 </div>
                 <div className="bg-gray-900/35 border border-gray-800 p-4 rounded-xl text-center">
                   <span className="block text-xl font-display font-black text-white">200</span>
-                  <span className="block text-xs font-mono text-gray-500 mt-1">Repository Quality</span>
+                  <span className="block text-xs font-mono text-gray-500 mt-1">Repo Quality</span>
                 </div>
                 <div className="bg-gray-900/35 border border-gray-800 p-4 rounded-xl text-center">
                   <span className="block text-xl font-display font-black text-white">250</span>
-                  <span className="block text-xs font-mono text-gray-500 mt-1">Commit Activity</span>
+                  <span className="block text-xs font-mono text-gray-500 mt-1">Commit Volume</span>
                 </div>
                 <div className="bg-gray-900/35 border border-gray-800 p-4 rounded-xl text-center">
                   <span className="block text-xl font-display font-black text-white">150</span>
-                  <span className="block text-xs font-mono text-gray-500 mt-1">Open Source OS</span>
+                  <span className="block text-xs font-mono text-gray-500 mt-1">Open Source</span>
                 </div>
                 <div className="bg-gray-900/35 border border-gray-800 p-4 rounded-xl text-center">
                   <span className="block text-xl font-display font-black text-white">100</span>
@@ -480,8 +475,28 @@ export default function App() {
               </div>
             </div>
 
+            {/* Scorecard CTA Banner */}
+            <div className="max-w-4xl mx-auto bg-gradient-to-r from-brand-purple/20 via-brand-blue/20 to-brand-green/10 border border-brand-purple/30 rounded-3xl p-8 sm:p-10 text-center relative overflow-hidden">
+              <div className="relative z-10 space-y-4">
+                <h3 className="text-2xl sm:text-3xl font-display font-black text-white">
+                  Ready to check your developer score?
+                </h3>
+                <p className="text-gray-300 text-sm max-w-xl mx-auto">
+                  Instant AI review for internships, placement resumes, freelance pitches, and open-source programs.
+                </p>
+                <button
+                  onClick={() => setCurrentTab("score")}
+                  className="mt-2 inline-flex items-center gap-2 px-7 py-3.5 bg-gradient-to-r from-brand-purple to-brand-blue text-white font-bold font-mono text-sm uppercase rounded-xl hover:opacity-95 shadow-xl shadow-brand-purple/30 transition-all active:scale-95"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Get Your Scorecard Now
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
             {/* Top Leaderboard Sneak-peek list */}
-            <div className="max-w-4xl mx-auto space-y-6 pt-6">
+            <div className="max-w-4xl mx-auto space-y-6 pt-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Award className="w-5 h-5 text-brand-purple" />
@@ -537,6 +552,117 @@ export default function App() {
           </div>
         )}
 
+        {/* DEDICATED SCORE GENERATOR PAGE */}
+        {currentTab === "score" && (
+          <div className="max-w-3xl mx-auto space-y-10 py-4 animate-fade-in">
+            <div className="text-center space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-purple/10 border border-brand-purple/30 rounded-full text-brand-purple font-mono text-xs uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5" />
+                Scorecard Generator
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-display font-black text-white">
+                Get Your GitHub Scorecard
+              </h1>
+              <p className="text-sm text-gray-400 max-w-lg mx-auto">
+                Enter any public GitHub username or profile link. Our AI engine analyzes your repositories, commit activity, and open-source contributions.
+              </p>
+            </div>
+
+            {/* Main Scorecard Analysis Form Box */}
+            <div className="bg-gray-900/60 p-6 sm:p-8 rounded-2xl border border-gray-800 shadow-2xl space-y-6 relative overflow-hidden backdrop-blur-xl">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-brand-purple/10 rounded-full blur-3xl"></div>
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-brand-blue/10 rounded-full blur-3xl"></div>
+
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (username.trim()) handleAnalyze(username);
+                }}
+                className="space-y-4 relative z-10"
+              >
+                <div className="space-y-2">
+                  <label className="text-xs font-mono uppercase tracking-wider text-gray-400 font-semibold block">
+                    GitHub Username or Profile URL
+                  </label>
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                    <input 
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="e.g. torvalds, yyx990803, or github.com/username"
+                      autoFocus
+                      className="w-full bg-black/60 border border-gray-700 rounded-xl py-4 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple transition-all text-sm font-mono shadow-inner"
+                    />
+                  </div>
+                </div>
+
+                {analysisError && (
+                  <div className="p-3.5 bg-red-950/40 border border-red-900/60 rounded-xl flex gap-2.5 items-start text-xs text-red-300">
+                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                    <div>
+                      {analysisError.includes("USER_NOT_FOUND") 
+                        ? "This GitHub handle could not be found. Please check spelling or verify the user is public."
+                        : analysisError}
+                    </div>
+                  </div>
+                )}
+
+                <button 
+                  type="submit"
+                  disabled={!username.trim()}
+                  className="w-full bg-gradient-to-r from-brand-purple to-brand-blue disabled:opacity-50 text-white py-4 px-6 rounded-xl font-bold hover:opacity-95 active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-sm shadow-xl shadow-brand-purple/20 uppercase font-mono tracking-wider"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Generate AI Scorecard
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </form>
+
+              {/* Sample Quick Profiles */}
+              <div className="pt-2 border-t border-gray-800/80 flex flex-wrap items-center justify-between gap-3 text-xs text-gray-400 font-mono relative z-10">
+                <span className="text-gray-500">Popular developer presets:</span>
+                <div className="flex flex-wrap gap-2">
+                  {["torvalds", "yyx990803", "gvanrossum", "BikramManna"].map((sample) => (
+                    <button 
+                      key={sample}
+                      type="button"
+                      onClick={() => triggerUserFromLeaderboard(sample)} 
+                      className="px-2.5 py-1 bg-gray-800/70 hover:bg-brand-purple hover:text-white text-gray-300 rounded-md border border-gray-700/60 transition-all text-[11px]"
+                    >
+                      @{sample}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Evaluation Categories Card Breakdown */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="bg-gray-900/30 border border-gray-800/80 p-5 rounded-xl space-y-2">
+                <div className="flex items-center gap-2 text-brand-green font-mono text-xs font-bold uppercase">
+                  <CheckCircle2 className="w-4 h-4" />
+                  Code Activity & Repos
+                </div>
+                <p className="text-xs text-gray-400 leading-relaxed">
+                  Evaluates 12-month commit volume, contribution streak consistency, stars, forks, and topic tagging across all repositories.
+                </p>
+              </div>
+
+              <div className="bg-gray-900/30 border border-gray-800/80 p-5 rounded-xl space-y-2">
+                <div className="flex items-center gap-2 text-brand-blue font-mono text-xs font-bold uppercase">
+                  <Briefcase className="w-4 h-4" />
+                  Career Insights & Badges
+                </div>
+                <p className="text-xs text-gray-400 leading-relaxed">
+                  Generates role matches (Frontend, Backend, DevOps), code refactor suggestions, and dynamic markdown badges for your GitHub README.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        )}
+
         {/* PROFILE DASHBOARD REPORT CARD */}
         {currentTab === "dashboard" && currentReport && (
           <div className="space-y-8 animate-fade-in print:bg-white print:text-black">
@@ -545,10 +671,10 @@ export default function App() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-800 pb-6 print:hidden">
               <div className="flex items-center gap-2">
                 <button 
-                  onClick={() => setCurrentTab("landing")}
+                  onClick={() => setCurrentTab("score")}
                   className="text-xs font-mono font-bold text-gray-400 hover:text-white px-3 py-1.5 bg-gray-900 border border-gray-800 rounded-lg hover:bg-gray-800 transition-colors"
                 >
-                  ← New Analysis
+                  ← Analyze Another Profile
                 </button>
                 <div className="h-4 w-px bg-gray-800 mx-1"></div>
                 <span className="text-xs text-gray-400 font-mono">
