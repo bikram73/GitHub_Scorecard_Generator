@@ -266,6 +266,3 @@ Returns the global developer rankings.
 
 This project is open-source and available under the [MIT License](LICENSE).
 
-<div align="center">
-  <sub>Built with ❤️ using React 19, Tailwind CSS, and Google Gemini AI.</sub>
-</div>
